@@ -51,9 +51,9 @@ package() {
 	make DESTDIR="$pkgdir" install || return 1
 }
 
-md5sums="ca760edc1b8849fd348cf9f5bf7333f3  alpine-2.20.tar.xz
+md5sums="2d63c923f7995890c0eecfc0c3d1c936  alpine-2.20.tar.xz
 f9d8a0f9d6722ba15c473a7925a64285  uclibc-musl.patch"
-sha256sums="da7a2928a4040d4af9ff617e87122aa8d1171f455608e0f2f74c24cfa3fe882d  alpine-2.20.tar.xz
+sha256sums="9b20f0cd08968e7f7c09a1dd49548609fad3318ddf0b32fa3047b8b0eda1c80e  alpine-2.20.tar.xz
 96b3f504fbb91cfe5e3f7eb970ae618069eee54a0007e905d7aa4f6d514c9df8  uclibc-musl.patch"
-sha512sums="6aa0c75c79e51a45b61f72e1eb7724c145a4c385a9a083e622989455f5e9e493d8e2ddec637a652357cd1d1482109944eb6931de42d6aae526f76edcf8ceb48f  alpine-2.20.tar.xz
+sha512sums="be90f5028033e8e98d3df34d3adaef677dc39f7c8ef26efbbf9e610f0f04ddaabd36004774c5b03139e9ba07cc88de6f7257d192398657a3f5d834ad93b63da3  alpine-2.20.tar.xz
 1b14352571dd12749bbb6ebc1fd468dbb5a8e4d7a27e87f5baeb00a60d5c1a016d925c6bc776da7e1dbf0ad8d799a65049b64774113274d7ffb07c7b1b196775  uclibc-musl.patch"

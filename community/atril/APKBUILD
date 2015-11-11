@@ -1,0 +1,50 @@
+# Contributor: Alan Lacerda <alacerda@alpinelinux.org>
+# Maintainer: Alan Lacerda <alacerda@alpinelinux.org>
+pkgname=atril
+pkgver=1.12.0
+pkgrel=0
+pkgdesc="A document viewer for MATE"
+url="https://github.com/mate-desktop/atril"
+arch="all"
+license="GPLv2"
+depends="mate-icon-theme abiword-plugin-epub"
+depends_dev=""
+makedepends="$depends_dev intltool glib-dev gtk+2.0-dev  mate-desktop-dev
+	dconf-dev libsm-dev libsecret-dev caja-extensions-dev caja-dev 
+	poppler-dev tiff-dev itstool libxml2-utils"
+install=""
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang"
+source="http://pub.mate-desktop.org/releases/${pkgver%.*}/$pkgname-$pkgver.tar.xz"
+
+_builddir="$srcdir/$pkgname-$pkgver"
+prepare() {
+	local i
+	cd "$_builddir"
+	for i in $source; do
+		case $i in
+		*.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
+		esac
+	done
+}
+
+build() {
+	cd "$_builddir"
+	./configure \
+                --build=$CBUILD \
+                --host=$CHOST \
+                --sysconfdir=/etc \
+		--enable-epub \
+                --with-gtk=2.0 \
+                --prefix=/usr || return 1
+
+        make || return 1
+}
+
+package() {
+	cd "$_builddir"
+	make DESTDIR="${pkgdir}" install || return 1
+}
+
+md5sums="b970dffa438b2420f3ed2f6088835319  atril-1.12.0.tar.xz"
+sha256sums="a6742213854a936c4204dc14c8fbc46ca26a7f90ca1f338d01e433f63cd5b47c  atril-1.12.0.tar.xz"
+sha512sums="f444e1e405019103333ac9b59054b2610fd1c212d33547063bb07e5a263dd1966ffca22a8631e925083be1e230b1a5ab7d452c5add93131a0e09d5a6929f41a1  atril-1.12.0.tar.xz"
