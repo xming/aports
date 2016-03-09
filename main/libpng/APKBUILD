@@ -1,7 +1,7 @@
 # Contributor: Carlo Landmeter <clandmeter@gmail.com>
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=libpng
-pkgver=1.6.18
+pkgver=1.6.21
 _apngver=$pkgver
 pkgrel=0
 pkgdesc="Portable Network Graphics library"
@@ -38,9 +38,9 @@ package() {
 	install -Dm644 LICENSE "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE || return 1
 }
 
-md5sums="685ce2ebbf4ad9a03992fb5f10c38df1  libpng-1.6.18.tar.gz
-a9c85fe3cf0347ea94356f1e70d07973  libpng-1.6.18-apng.patch.gz"
-sha256sums="593d9216270dca1ab1fc2f0e4383a9ac99394c349392fb0f65043f0e6fbfdac6  libpng-1.6.18.tar.gz
-7b9a80bd05e54babdbf6623dab8df7d050331f61417ba660d08a32b80594543c  libpng-1.6.18-apng.patch.gz"
-sha512sums="fe60370fa75c92854e5a75f87aba4252464a23bce087506201430d920f64c5fc32f0b732131e1d9ad20664c1353eeae9b24081c7f831d6f73f86199b712ffd1f  libpng-1.6.18.tar.gz
-b41f2db1abd1c11c7b9339c2a9cae5fb2d31691677de686aa06ded951b65c0b3bfe48e5aaeb956a8e539b08777f5b2fb734fa21a6908671f0f93921ea2cac966  libpng-1.6.18-apng.patch.gz"
+md5sums="aca36ec8e0a3b406a5912243bc243717  libpng-1.6.21.tar.gz
+360346394543ec0a880f61830541608f  libpng-1.6.21-apng.patch.gz"
+sha256sums="b36a3c124622c8e1647f360424371394284f4c6c4b384593e478666c59ff42d3  libpng-1.6.21.tar.gz
+6da70e2526fe91c3379592546d2f14c0dfef8f04e2b338dddd5dc9ef45618c73  libpng-1.6.21-apng.patch.gz"
+sha512sums="033bbac08e5415500289dc41a854f1a2b1b61923b62bcdccb6f5d9c0f1efb95924712f2b5ec370bfbea30ec3deab5883a308ee78709a81095c748359a63373ae  libpng-1.6.21.tar.gz
+144bf07770d5584ea78648b65468a9acd40909b34c501ec4d91fc53ddf8ca85c99e2fcb1b245fce54d045b60ad2e1da575c27ad6ca566358643b4573176f05b2  libpng-1.6.21-apng.patch.gz"

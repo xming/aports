@@ -2,14 +2,14 @@
 # Contributor: William Pitcock <nenolod@dereferenced.org>
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=awesome
-pkgver=3.5.6
+pkgver=3.5.8
 pkgrel=1
 pkgdesc="lua-configurable window manager framework"
 url="http://awesome.naquadah.org/"
 arch="x86 x86_64"
 license="GPL2+"
-depends="imagemagick lua-lgi cairo-gobject pango"
-makedepends="lua lua-dev libxcb-dev pango-dev cairo-dev cmake gperf glib-dev
+depends="imagemagick lua5.1-lgi cairo-gobject pango"
+makedepends="lua lua5.1 lua5.1-dev libxcb-dev pango-dev cairo-dev cmake gperf glib-dev
 	imlib2-dev libxdg-basedir-dev libev-dev startup-notification-dev
 	xcb-util-keysyms-dev xcb-util-image-dev xcb-util-dev xcb-util-wm-dev
 	dbus-dev lua-doc gdk-pixbuf-dev xcb-util-cursor-dev"
@@ -45,6 +45,6 @@ package() {
 	make DESTDIR="$pkgdir" install || return 1
 }
 
-md5sums="db1c31de752ab8e5f7aaa338718202af  awesome-3.5.6.tar.xz"
-sha256sums="37f49de187825425cb3096fc870959d5fec9302b22ffd0f2874d8a18e85046d7  awesome-3.5.6.tar.xz"
-sha512sums="8d89bf46956276a8bcf106bb255c051e8382b08617e17691134a8f3e5db3ec9f7773581c02ce62d23e72499f7b1e60fe4322c211e41219b5bffd1897a96f6cf6  awesome-3.5.6.tar.xz"
+md5sums="bdca8e1740cd9c5a76bfc46f8d943cf1  awesome-3.5.8.tar.xz"
+sha256sums="7c30c96c57bd72cfed630bbccc344054fe44b37c0a79bdd98075c507af672ec6  awesome-3.5.8.tar.xz"
+sha512sums="be5604821e256e36067750c341ca6f8669e159527b93654c8fc41bcd161da6d87fa0e3c5fccc51821586d163535ac78363d12d99ed81b6fb14e26da59136d5ef  awesome-3.5.8.tar.xz"

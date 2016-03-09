@@ -2,13 +2,13 @@
 # Maintainer: Ted Trask <ttrask01@yahoo.com>
 _luaversion=5.2
 pkgname=acf-provisioning
-pkgver=0.8.4
+pkgver=0.9.1
 pkgrel=0
 pkgdesc="ACF for provisioning templated configs to devices"
 url="http://git.alpinelinux.org/cgit/acf-provisioning"
 arch="noarch"
 license="GPL2"
-depends="acf-core lua lua-sql-postgres postgresql-client lua-posixtz"
+depends="acf-core lua-sql-postgres postgresql-client lua-posixtz lua-xml"
 makedepends=""
 install=""
 subpackages=""
@@ -24,6 +24,6 @@ package() {
 	make DESTDIR="$pkgdir" install
 }
 
-md5sums="c609af3dda7179ad2edb3623b45be610  acf-provisioning-0.8.4.tar.xz"
-sha256sums="10ed994fbf33a31b6c4a294040e2e558b28cb5f2e8c408828b6dd3353643da0d  acf-provisioning-0.8.4.tar.xz"
-sha512sums="836de76922ba6e716e783d51d1191a908ec15968c797e6882fee50c1bfecb152563df6f197d30d49cc6a1bf0c0470463ebe504674a23bd442b42e37e38372815  acf-provisioning-0.8.4.tar.xz"
+md5sums="a040105a6011a6d48fc9b80ee7453dbe  acf-provisioning-0.9.1.tar.xz"
+sha256sums="99887164626beb66f4dbf1d089c953f8f4cd5e6849354cbcc87e9c3371426a5e  acf-provisioning-0.9.1.tar.xz"
+sha512sums="6b0e22a3e4808364f840c1e085305796f8e8d49b6d6eafb3f45f81699ec3c3813f073920db40e16c0f5a363691af5451a2972865f9f2b36744b9151190f92474  acf-provisioning-0.9.1.tar.xz"

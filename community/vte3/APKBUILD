@@ -1,0 +1,62 @@
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=vte3
+pkgver=0.42.4
+pkgrel=0
+pkgdesc="Virtual Terminal Emulator library"
+url="https://developer.gnome.org/vte/"
+arch="all"
+license="LGPL2+"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang"
+depends=
+depends_dev="pango-dev gtk+3.0-dev"
+makedepends="$depends_dev intltool python ncurses-dev gobject-introspection-dev
+	vala gnutls-dev linux-headers libxml2-utils
+	autoconf automake libtool"
+source="http://ftp.gnome.org/pub/GNOME/sources/vte/${pkgver%.*}/vte-$pkgver.tar.xz
+	allow_alt_in_terminal.patch
+	werror.patch
+	"
+
+_builddir="$srcdir"/vte-$pkgver
+prepare() {
+	cd "$_builddir"
+	for i in $source; do
+		case $i in
+		*.patch)
+			patch -p1 -i "$srcdir"/$i || return 1
+			;;
+		esac
+	done
+	autoreconf -vif || return 1
+}
+
+build() {
+	cd "$_builddir"
+	export CFLAGS="$CFLAGS -D_GNU_SOURCE"
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--libexecdir=/usr/lib/$pkgname \
+		--localstatedir=/var \
+		--disable-static \
+		--enable-introspection \
+		|| return 1
+	make V=1 || return 1
+}
+
+package() {
+	cd "$_builddir"
+	make DESTDIR="$pkgdir" install || return 1
+}
+
+md5sums="92f5f49f87a9157e298bba5be8ecf7a5  vte-0.42.4.tar.xz
+6ae30139b7d7ca78b56a3b55426c83f2  allow_alt_in_terminal.patch
+ba558bb881207c6c7fb4fd0451178aa1  werror.patch"
+sha256sums="08c88bf5c0aa1dfa3711e2e83b784fb5ea82025661f30b54e93eebd5f4bce113  vte-0.42.4.tar.xz
+6e4488f9a60f52a2a7eeb09865bdc42f00c309eb4cf8d548b524b9c33fadcd8a  allow_alt_in_terminal.patch
+013d44075ba179abb719a17470a0ae18995054e5fcef496dcb5933ec7bfa9e24  werror.patch"
+sha512sums="871b47d976ae8faafabd2b9dd092b40b2b452fcfd7f60182db7c12ade0c265a1810e811a9a54b6a2c2061ff05f06743b90057babf300b98f391481bb02265fb5  vte-0.42.4.tar.xz
+a4786a97a5caa42db3b29808c3542777684fcf7d931a116d4e3d847e859a64fb59a2d5b60927dc8e5c2733efc55c29aa4d30aeb02597aff5f034c172cc528833  allow_alt_in_terminal.patch
+ff199ede8e415d141d897e9c922db84d33c2c28d07958a5ec44b3688809809885f45275cc1aeed56fa2d8de46e9cc2527f5e9682a8ea28af7e39b275340c85c4  werror.patch"

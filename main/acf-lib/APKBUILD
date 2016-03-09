@@ -2,22 +2,41 @@
 # Maintainer: Ted Trask <ttrask01@yahoo.com>
 _luaversions="5.1 5.2"
 pkgname=acf-lib
-pkgver=0.8.0
-pkgrel=0
+pkgver=0.9.0
+pkgrel=1
 pkgdesc="Lua libraries for ACF"
 url="http://git.alpinelinux.org/cgit/acf-lib"
 arch="noarch"
 license="GPL2"
 depends="lua-subprocess"
+subpackages=""
+for _i in $_luaversions; do
+	subpackages="$subpackages acf-lib-lua$_i:split_${_i/./_}"
+done
 source="http://dev.alpinelinux.org/archive/$pkgname/$pkgname-$pkgver.tar.xz"
 
 package() {
+	mkdir -p "$pkgdir"
+	echo "package with pkgdir=$pkgdir"
 	cd "$srcdir/$pkgname-$pkgver"
 	for _i in $_luaversions; do
 		sed "s~luadir=.*~luadir=\${prefix}/share/lua/$_i/acf~" -i config.mk
-		make DESTDIR="$pkgdir" install
+		make DESTDIR="$pkgdir-lua$_i" install
 	done
 }
-md5sums="a2db89a32e091cb47c868642c6ba0712  acf-lib-0.8.0.tar.xz"
-sha256sums="18c33e7919333a38fd2237128de93dcb9e9c3feb6dfb846a96a6aad01cf92ba0  acf-lib-0.8.0.tar.xz"
-sha512sums="b84e59a34463480121f1337a86f2aff7e833a5c00fe869688fece84e5ce1625344dcc5c5c60e8f352ca54258be1144189f8cbe81dbd642d03039697f2821c323  acf-lib-0.8.0.tar.xz"
+
+_split() {
+	local d= _ver=$1
+	pkgdesc="Lua $_ver libraries for ACF"
+	install_if="lua$_ver $pkgname=$pkgver-r$pkgrel"
+	replaces="$pkgname"
+	depends=
+}
+
+for _i in $_luaversions; do
+	eval "split_${_i/./_}() { _split $_i; }"
+done
+
+md5sums="1d9927a6db573fd6ae8a28b02f08cb1e  acf-lib-0.9.0.tar.xz"
+sha256sums="6643554b5e684871181c5c162039fb5f7dbfee8e246b48e0d1c731410700e6c8  acf-lib-0.9.0.tar.xz"
+sha512sums="04f59a5f8e949e93e104bbd283a3bab789df287e3da6e19caf18546b5fedb3d5458acdf0a1f8322cb28373dec1d81b6eae4033dc424a40371b022d2c1202c3fb  acf-lib-0.9.0.tar.xz"

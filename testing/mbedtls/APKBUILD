@@ -1,7 +1,7 @@
 # Contributor: Łukasz Jendrysik <scadu@yandex.com>
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=mbedtls
-pkgver=2.1.2
+pkgver=2.2.1
 pkgrel=0
 pkgdesc="Light-weight cryptographic and SSL/TLS library"
 url="https://tls.mbed.org/"
@@ -14,7 +14,7 @@ install=""
 subpackages="$pkgname-static $pkgname-dev $pkgname-utils"
 source="https://tls.mbed.org/download/mbedtls-$pkgver-gpl.tgz"
 
-_builddir="$srcdir"/mbedtls-2.1.2
+_builddir="$srcdir"/mbedtls-$pkgver
 prepare() {
 	local i
 	cd "$_builddir"
@@ -27,12 +27,15 @@ prepare() {
 
 build() {
 	cd "$_builddir"
+	# enable flags for non-embedded systems
+	sed -i -e 's|//\(#define MBEDTLS_THREADING_C\)|\1|' -e 's|//\(#define MBEDTLS_THREADING_PTHREAD\)|\1|' include/mbedtls/config.h
 	cmake . \
 		-DCMAKE_INSTALL_PREFIX=/usr \
 		-DCMAKE_BUILD_TYPE="Release" \
 		-DUSE_SHARED_MBEDTLS_LIBRARY=1 \
 		|| return 1
 	make || return 1
+	make test || return 1
 }
 
 package() {
@@ -52,6 +55,6 @@ static() {
 	mv "$pkgdir"/usr/lib/*.a "$subpkgdir"/usr/lib/
 }
 
-md5sums="38b7baae95d6b0826605a1edfffeebe4  mbedtls-2.1.2-gpl.tgz"
-sha256sums="0dcca471d1f76352af5e26d64880ef6a30963ad6474a78c0d8e7fbb6dd691fa4  mbedtls-2.1.2-gpl.tgz"
-sha512sums="b5869896dd66a4c0493f84dd01b9eb1f134ee4ab6fc559b260400d733f3c8a02a8b9fe50cdad6367c95a0a34995ca4d09270087e659552fcf264995d34d0b261  mbedtls-2.1.2-gpl.tgz"
+md5sums="b6909d94600fc5f644e9bca52e96fb27  mbedtls-2.2.1-gpl.tgz"
+sha256sums="bb1bffa3ac5ab143be2aae3d45a7a92b36112888ef465024d83724865fe62974  mbedtls-2.2.1-gpl.tgz"
+sha512sums="03c32b46369d35e61acfeac83f417d09307d2f1e4358f9ea6af275d9a9a2319ca7a244733b5950a48d59f6305e4adcad6a66e589b42ee7417d1d4362c2595a4f  mbedtls-2.2.1-gpl.tgz"

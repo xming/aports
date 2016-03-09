@@ -3,18 +3,18 @@
 # Contributor: Natanael Copa <ncopa@alpinelinux.org>
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=mpv
-pkgver=0.12.0
-pkgrel=1
+pkgver=0.16.0
+pkgrel=0
 pkgdesc="Video player based on MPlayer/mplayer2"
 url="http://mpv.io/"
 arch="all"
 license="GPL"
-depends=
+depends=""
 makedepends="libxxf86dga-dev libxv-dev libmad-dev lame-dev libao-dev
 	libtheora-dev xvidcore-dev zlib-dev sdl-dev freetype-dev
 	x264-dev faac-dev ttf-dejavu libxvmc-dev alsa-lib-dev libva-dev
 	mesa-dev ffmpeg-dev libass-dev perl lua5.2-dev libvdpau-dev python
-	libxext-dev libxscrnsaver-dev py-docutils"
+	libxext-dev libxscrnsaver-dev py-docutils rsound-dev"
 install=""
 subpackages="
 	$pkgname-doc
@@ -25,14 +25,14 @@ source="$pkgname-$pkgver.tar.gz::https://github.com/mpv-player/mpv/archive/v$pkg
 
 _builddir="$srcdir"/mpv-$pkgver
 prepare() {
-	local i
 	cd "$_builddir"
 	for i in $source; do
 		case $i in
 		*.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
 		esac
 	done
-	./bootstrap.py
+
+	./bootstrap.py || return 1
 }
 
 build() {
@@ -44,8 +44,8 @@ build() {
 		--enable-libass \
 		--enable-zsh-comp \
 		--enable-xss \
+		--enable-rsound \
 		|| return 1
-
 	./waf build || return 1
 }
 
@@ -77,6 +77,6 @@ zshcomp() {
 		"$subpkgdir/usr/share/zsh/site-functions" || return 1
 }
 
-md5sums="a3135f6227e28191cf620b3f2ea250d1  mpv-0.12.0.tar.gz"
-sha256sums="df242044c749d850344f5499860d852849147f20c63d36d2cd678627bd8d6cc4  mpv-0.12.0.tar.gz"
-sha512sums="ce570e3d375a4ffd2b80bab956cae7427dfd265cdee4e7be4485a5298f549cf3dedd58d537fcb9b09f5fade4c72c106b4b7dadca3be69eb4a17c7671421bd500  mpv-0.12.0.tar.gz"
+md5sums="e2a9e7d19d9e0e8861af141a67a9e4bd  mpv-0.16.0.tar.gz"
+sha256sums="fc3619de0ede16fbb023ac72589090e8e77fd9d9e03a81adc728105d50ef38ba  mpv-0.16.0.tar.gz"
+sha512sums="d328dba2cc68bd3ae2e14bfcf2b4f69f076691bb40db77036e716f783d7683fde668b652829106661dfeea46d66b4a7ad61b58610411b69bd5265adea4f20bd6  mpv-0.16.0.tar.gz"

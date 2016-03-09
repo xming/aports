@@ -1,8 +1,7 @@
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 
-_mainflavor=rpi
-pkgname=linux-$_mainflavor
-pkgver=4.1.12
+pkgname=linux-rpi
+pkgver=4.1.18
 case $pkgver in
 *.*.*)	_kernver=${pkgver%.*};;
 *.*)	_kernver=${pkgver};;
@@ -16,14 +15,17 @@ options="!strip"
 install=
 source="http://ftp.kernel.org/pub/linux/kernel/v4.x/linux-$_kernver.tar.xz
 	http://ftp.kernel.org/pub/linux/kernel/v4.x/patch-$pkgver.xz
-	http://dev.alpinelinux.org/~tteras/linux-4.1.y-rpi-20151025.patch
-	rpi-cirrus-4.1.x-20151025.patch
+	http://dev.alpinelinux.org/~tteras/linux-4.1.y-rpi-20160209.patch
+	rpi-cirrus-4.1.y-20151218.patch
+	gpio-mcp23s08-pullups.patch
+	rotary-encoder-fix.patch
+	issue-4973.patch
 
 	config-rpi.armhf
 	config-rpi2.armhf
 	markdt
 	"
-subpackages="$pkgname-dev"
+subpackages=""
 _flavors=
 for _i in $source; do
 	case $_i in
@@ -31,9 +33,8 @@ for _i in $source; do
 		_f=${_i%.$CARCH}
 		_f=${_f#config-}
 		_flavors="$_flavors ${_f}"
-		if [ "linux-$_f" != "$pkgname" ]; then
-			subpackages="$subpackages linux-${_f}"
-		fi
+		[ "linux-$_f" != "$pkgname" ] && subpackages="$subpackages linux-${_f}"
+		subpackages="$subpackages linux-${_f}-dev:_${_f}_dev"
 		;;
 	esac
 done
@@ -141,14 +142,8 @@ package() {
 	_package rpi "$pkgdir"
 }
 
-# subflavors install in $subpkgdir
-rpi2() {
-	_package rpi2 "$subpkgdir"
-}
-
-# we only provide -dev for main flavor for now
-dev() {
-	local _abi_release=${pkgver}-${pkgrel}-$_mainflavor
+_dev() {
+	local _abi_release=${pkgver}-${pkgrel}-$1
 	# copy the only the parts that we really need for build 3rd party
 	# kernel modules and install those as /usr/src/linux-headers,
 	# simlar to what ubuntu does
@@ -156,14 +151,14 @@ dev() {
 	# this way you dont need to install the 300-400 kernel sources to
 	# build a tiny kernel module
 	#
-	pkgdesc="Headers and script for third party modules for grsec kernel"
+	pkgdesc="Headers and script for third party modules for $1 grsec kernel"
 	depends="gmp-dev bash"
 	local dir="$subpkgdir"/usr/src/linux-headers-${_abi_release}
 
 	# first we import config, run prepare to set up for building
 	# external modules, and create the scripts
 	mkdir -p "$dir"
-	cp "$srcdir"/config-$_mainflavor.${CARCH} "$dir"/.config
+	cp "$srcdir"/config-$1.${CARCH} "$dir"/.config
 	make -j1 -C "$srcdir"/linux-$_kernver O="$dir" HOSTCC="${CC:-gcc}" \
 		silentoldconfig prepare modules_prepare scripts
 
@@ -187,7 +182,7 @@ dev() {
 	find $(find arch -name include -type d -print) -type f \
 		| cpio -pdm "$dir"
 
-	install -Dm644 "$srcdir"/build-$_mainflavor/Module.symvers \
+	install -Dm644 "$srcdir"/build-$1/Module.symvers \
 		"$dir"/Module.symvers
 
 	mkdir -p "$subpkgdir"/lib/modules/${_abi_release}
@@ -195,24 +190,38 @@ dev() {
 		"$subpkgdir"/lib/modules/${_abi_release}/build
 }
 
+for _f in $_flavors; do
+	[ "linux-$_f" != "$pkgname" ] && eval "${_f}() { _package "$_f" "$subpkgdir"; }"
+	eval "_${_f}_dev() { _dev $_f; }"
+done
+
 md5sums="fe9dc0f6729f36400ea81aa41d614c37  linux-4.1.tar.xz
-e790ae84e0109a3d95cc617be448171b  patch-4.1.12.xz
-28edef874a4c2c9789605a30fda0a5b6  linux-4.1.y-rpi-20151025.patch
-e3429d7772cb3bf73ff4c51aabb2a5cf  rpi-cirrus-4.1.x-20151025.patch
-e2e2333bbbf3e420b770c54c63e2c235  config-rpi.armhf
-f22be75c5c4f65fc06ae606eaf79b736  config-rpi2.armhf
+cf5048c86823ee6182f0856ac5a3fa7d  patch-4.1.18.xz
+b21c5bee698bb499a4fc4cdaf26a7150  linux-4.1.y-rpi-20160209.patch
+d4b70738cf06dbd70534d5e873442951  rpi-cirrus-4.1.y-20151218.patch
+b66e8aa4991ca5c2ccd61559ed7e6491  gpio-mcp23s08-pullups.patch
+892ab7d20855cef17eb8add060f99c87  rotary-encoder-fix.patch
+29281b74d2cef6965fa4ab6d826a2aa4  issue-4973.patch
+3b645eef5408cbbcf9c6b13581ef775a  config-rpi.armhf
+1c21e249ea27b70dd5e0a7b69820fdee  config-rpi2.armhf
 e587cae1dca2f5992555d9bcf53deecf  markdt"
 sha256sums="caf51f085aac1e1cea4d00dbbf3093ead07b551fc07b31b2a989c05f8ea72d9f  linux-4.1.tar.xz
-f3520b06e6a2b9929173c680de75f11cde9f0a380e04195d538b5de820a549ae  patch-4.1.12.xz
-471375facefd099de01eae67215e74e31db1e113157c0e43a21e7df27e64ca75  linux-4.1.y-rpi-20151025.patch
-b1b5b8bf16e2eacec19931279984f2bc96851da6e9786d4c9422caa1ac7af2fe  rpi-cirrus-4.1.x-20151025.patch
-17a112f574b066bc210aa4d8f7090f053596b4cb7dc02c6cb9926a994d7304fd  config-rpi.armhf
-f480a726e92d871d1c9f7ef68abcc9f61f06f8027fc60a6668219909b6b657a2  config-rpi2.armhf
+c69cbff479740d6bbd452d2264ba0afefa99ae51bb7ae52bfbde348ea8d8b20c  patch-4.1.18.xz
+64c0d751f8ebc54dbb02aa05c80127f5affc6a64336a9d4e29b1cd8481a7bdcd  linux-4.1.y-rpi-20160209.patch
+5aa17a1554598c3b364b7e8aea84bacfc13e8aca9b9101e58d89c211674a3d5a  rpi-cirrus-4.1.y-20151218.patch
+b389a556bbd98053881b43deef1adf20640f980557c5f37cfd7ece2daeecbda9  gpio-mcp23s08-pullups.patch
+aaa1da7d9cac68206a8ddf1e1b8c08bc62696f789468ebfd6894c891d8700533  rotary-encoder-fix.patch
+3a16e927ce53a8c56e7f1dd86fe8ad08b1c06466f5206c521a7e2de1e4796d6c  issue-4973.patch
+7eb3025189c64f4023db864169dcc9d64d029fc871d0ffbc59621292a338772a  config-rpi.armhf
+10318f14c68a7fafe3b1a8f3208c8586dabce5c01598a4bf7a2da76166b273b4  config-rpi2.armhf
 0f6681fc5c3590e1dbe13a2bde796403bd1529cf0fe19720899eaa0db79bcb49  markdt"
 sha512sums="168ef84a4e67619f9f53f3574e438542a5747f9b43443363cb83597fcdac9f40d201625c66e375a23226745eaada9176eb006ca023613cec089349e91751f3c0  linux-4.1.tar.xz
-164f216faa8fef6a28fe03bdb69c7bee5ff99cf560271264b52e62aec63c1d4d6475d4a6f2b4b4c02d235568ebe8bafd3b36be75c8a505cde8edbb70136d89b4  patch-4.1.12.xz
-26752f27d0f2ca977e3d3a2132c150147b2263ce85ab5dfed67864b1adc2827a039ceaac14642d9c680a0572b7721d0f10d25786c2584fbc853817f487ef5ac3  linux-4.1.y-rpi-20151025.patch
-3e4717c21def19d7c9714b1d9d07f8dbf8fd27e986cbd978eda50c586cc21d1399b50db4255589d09abb6fe5b532c3959481098f229c4ea4526a044fc1da17b0  rpi-cirrus-4.1.x-20151025.patch
-3999e7defbc14681288febc420aa7f370c8fdbc047ad36b3c8d5bbee80a969af3c3f8b909a0d719d16cedf697a6a546cceceab39468ecb88554f73e422b7e076  config-rpi.armhf
-0f501be130951b2bfee26a3f056aaede9fac2b6becb6ffd28cd53f91571a70a69fe86d09589b3c61ecb04f40a6399ba6334aa8780601d709c95bfa74476a3e32  config-rpi2.armhf
+b95b82452206c2ef19e9fb1b01dcd6880c74f1b1fb9d8e1f209add734ba342d7c65401f3a4a2101eaa6b20b653b265ebc863052de71e01fa886ff7d7b1c1ad17  patch-4.1.18.xz
+522089ff412f64eb9c8dd802592c639178385b818d19f66098351a9afa540f7fe02f7b363e953d67a7e59517c270423adfc8d3958c129fb1ac8552293e6f50b0  linux-4.1.y-rpi-20160209.patch
+843afc1f2a72fa9618935dd67d4ac33a22ee78f20114af349f8d93e54864375b3ef192c8d8fde814d6685d5fe675c2a850743834ef89640eedce9f4db5ffdb67  rpi-cirrus-4.1.y-20151218.patch
+36724ba56cb8fdf3a3d347cffb67ae1cc3d7b1052d526b6b5134ebf6baae9f9724b586c97833453dc7697ab24699426f0749af78b6a80be36967a80033a0cf40  gpio-mcp23s08-pullups.patch
+12794c6e75d6a58253eac8f0778ba8bb6de1dca1541f0bcb58c25f13dab7261f89f2e1b87dacca09b6ed297f2d3e1a159229aab57e7472e041d6aa611b6634fa  rotary-encoder-fix.patch
+501c91bf2538a18102da59bbccc3097f9c3c90079acc0e946ff075074160c09b8a66934e5ce5470e170f0e4f93d114709a95230367426d0bb7ea02c4bdf4cc9b  issue-4973.patch
+51f7fcacb9fb05aa14e7ee7890f7726ce4b0001496cfe9ca2152693c2acf5fefbfa654d2d4f26058aa3b617141f29cff7e0427c30e291209829ab1e44c6412ba  config-rpi.armhf
+1e249312b12e5d247ca7e250653afbacb5bc9d23983eaa4d552ff5b28c2dc0b0302a1c6af499fa59fa166a31e067fddae191bd977b0bd13773a66c81ca398f93  config-rpi2.armhf
 a4ecd1f48db64f9d6a189250d1937d7f2cd3a049a3d24cc527d04d05db06137722f1ba44bcd6033794781c3f2cfe2fbe065410a16de4bfdf4b1cd95d89322a77  markdt"

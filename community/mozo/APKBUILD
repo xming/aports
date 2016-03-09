@@ -1,0 +1,47 @@
+# Contributor: Alan Lacerda <alacerda@alpinelinux.org>
+# Maintainer: Alan Lacerda <alacerda@alpinelinux.org>
+pkgname=mozo
+pkgver=1.12.0
+pkgrel=0
+pkgdesc="A menu editor for MATE"
+url="https://github.com/mate-desktop/mozo"
+arch="noarch"
+license="GPLv2"
+depends=""
+depends_dev=""
+makedepends="$depends_dev intltool mate-menus-dev glib-dev py-gobject-dev"
+install=""
+subpackages="$pkgname-doc $pkgname-lang"
+source="http://pub.mate-desktop.org/releases/${pkgver%.*}/$pkgname-$pkgver.tar.xz"
+
+_builddir="$srcdir/$pkgname-$pkgver"
+prepare() {
+	local i
+	cd "$_builddir"
+	for i in $source; do
+		case $i in
+		*.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
+		esac
+	done
+}
+
+build() {
+	cd "$_builddir"
+	./configure \
+                --build=$CBUILD \
+                --host=$CHOST \
+                --sysconfdir=/etc \
+                --with-gtk=2.0 \
+                --prefix=/usr \
+                || return 1
+        make || return 1
+}
+
+package() {
+	cd "$_builddir"
+	make DESTDIR="${pkgdir}" install || return 1
+}
+
+md5sums="af4a77d3fc233a9583ab9b19a6be3f6d  mozo-1.12.0.tar.xz"
+sha256sums="59ab1c873064177e5515ba31c493fe9fd158c37b1054f7ae638c6571640aecc7  mozo-1.12.0.tar.xz"
+sha512sums="93e760b791a74b6a6ca0377d5aaa060c8bf339dcfde91fcb146ef1e37cc25912b3c93fa2b4d612c0abf2bbd00597c80b58769bc88b57925ec4c465967f32c05b  mozo-1.12.0.tar.xz"

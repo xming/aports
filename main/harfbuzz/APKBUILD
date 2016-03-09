@@ -1,8 +1,8 @@
 # Contributor: Sören Tempel <soeren+alpinelinux@soeren-tempel.net>
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=harfbuzz
-pkgver=1.0.6
-pkgrel=1
+pkgver=1.2.3
+pkgrel=0
 pkgdesc="Text shaping library"
 url="http://freedesktop.org/wiki/Software/HarfBuzz"
 arch="all"
@@ -59,6 +59,6 @@ icu() {
 	mv "$pkgdir"/usr/lib/lib*icu.so.* "$subpkgdir"/usr/lib/
 }
 
-md5sums="2256fd144c936936db9c92e77510a011  harfbuzz-1.0.6.tar.bz2"
-sha256sums="f616a7fbdc78a627043f9029000bf08c0c71df59cde4143fc92a014f6a993b26  harfbuzz-1.0.6.tar.bz2"
-sha512sums="20ee169389a784e4ad4e2ff006a59a36879dba0a37a999ff51c2b4d76da9496a1a747d5176e9611998187452e6d18f880295bdfb9f45338acddf772fc3f16021  harfbuzz-1.0.6.tar.bz2"
+md5sums="da8d97e262e6ef8288e1ae76369421bd  harfbuzz-1.2.3.tar.bz2"
+sha256sums="8216d2404aaab7fde87be0365a90d64aa6c55928e104557cfcb37b54a096cb8c  harfbuzz-1.2.3.tar.bz2"
+sha512sums="9df730dd07f726150252e6c1db1b9f49182492d9b0443388aa3bb102482749cb3299079dde8f83430e7947633ccf8d21bc41a95f02ba497bfd8195e702d3b031  harfbuzz-1.2.3.tar.bz2"

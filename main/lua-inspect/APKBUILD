@@ -1,9 +1,9 @@
 # Contributor: Carlo Landmeter <clandmeter@gmail.com>
-# Maintainer:
+# Maintainer: Carlo Landmeter <clandmeter@gmail.com>
 pkgname=lua-inspect
-pkgver=3.0.0
+pkgver=3.0.3
 _luaversions="5.1 5.2 5.3"
-pkgrel=1
+pkgrel=0
 pkgdesc="Human-readable representation of Lua tables"
 url="https://github.com/kikito/inspect.lua"
 arch="noarch"
@@ -13,24 +13,14 @@ depends_dev=""
 makedepends="$depends_dev"
 install=""
 subpackages="$pkgname-doc"
-source="$pkgname-$pkgver.tar.gz::https://github.com/kikito/inspect.lua/archive/v3.0.0.tar.gz"
+source="$pkgname-$pkgver.tar.gz::https://github.com/kikito/inspect.lua/archive/v$pkgver.tar.gz"
 for _v in $_luaversions; do
         subpackages="$subpackages lua$_v-${pkgname#*lua-}:split_${_v/./_}"
 done
 
 _builddir="$srcdir/inspect.lua-$pkgver"
-prepare() {
-	local i
-	cd "$_builddir"
-	for i in $source; do
-		case $i in
-		*.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
-		esac
-	done
-}
-
 build() {
-	cd "$_builddir"
+	return 0
 }
 
 package() {
@@ -54,6 +44,6 @@ for _v in $_luaversions; do
         eval "split_${_v/./_}() { _split $_v; }"
 done
 
-md5sums="30a04fb86cd733c549a051b2821b5ff1  lua-inspect-3.0.0.tar.gz"
-sha256sums="77c7be558c6116cdf85ccca0a4193fc6bb7c9a83267a4f308c33027caa0962f8  lua-inspect-3.0.0.tar.gz"
-sha512sums="4876d9f49147a1bb06b06f91d1c56ce5250d9ccd6e211194a80a30389b6a8f6d99e7cd48811d8fe9a935845662fda164109af4dd63a0f2a911c330980983ce01  lua-inspect-3.0.0.tar.gz"
+md5sums="9338310f2eac43ad53699371f710fcda  lua-inspect-3.0.3.tar.gz"
+sha256sums="7a862491299fdc6c094f0e9e6b7db712f86981be91f7e2d4b1843488ff03c9a2  lua-inspect-3.0.3.tar.gz"
+sha512sums="6b7f0c4d7c035b63f50e6b616e6395f0fb5a84c8e41dee44e19604d0953c6102362d22259a4345209f2692adca11544b7b028a9ff2b8f6e6b751c004df4bc0f1  lua-inspect-3.0.3.tar.gz"

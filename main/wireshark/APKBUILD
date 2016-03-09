@@ -2,7 +2,7 @@
 # Contributor: Jeremy Thomerson <jeremy@thomersonfamily.com>
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=wireshark
-pkgver=1.12.8
+pkgver=2.0.2
 pkgrel=0
 pkgdesc="A network protocol analyzer - GTK version"
 url="http://www.wireshark.org"
@@ -13,7 +13,7 @@ makedepends="bison flex perl glib glib-dev libpcap-dev libcap-dev
 	gtk+3.0-dev c-ares-dev pcre-dev gnutls-dev libgcrypt-dev openssl-dev
 	libnl3-dev qt5-qtbase-dev bash"
 install=""
-subpackages="$pkgname-dev $pkgname-doc $pkgname-qt $pkgname-common tshark"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-gtk $pkgname-common tshark"
 source="http://www.wireshark.org/download/src/$pkgname-$pkgver.tar.bz2"
 
 _builddir="$srcdir"/$pkgname-$pkgver
@@ -49,7 +49,7 @@ build() {
 
 package() {
 	cd "$_builddir"
-	make -j1 DESTDIR="$pkgdir" install install_desktop_files || return 1
+	make -j1 DESTDIR="$pkgdir" install || return 1
 }
 
 common() {
@@ -57,13 +57,12 @@ common() {
 	pkgdesc="network protoccol analyzer - common files"
 	mkdir -p "$subpkgdir"/usr/lib "$subpkgdir"/usr/share \
 		"$subpkgdir"/usr/bin
-	mv "$pkgdir"/etc "$subpkgdir"/
 	mv "$pkgdir"/usr/share/wireshark "$subpkgdir"/usr/share/
 	mv "$pkgdir"/usr/lib/* "$subpkgdir"/usr/lib/
 	# move all bins except wireshark
 	for i in "$pkgdir"/usr/bin/*; do
 		case "$i" in
-			*/tshark|*/wireshark|*-qt) continue;;
+			*/tshark|*/wireshark|*-gtk) continue;;
 		esac
 		mv "$i" "$subpkgdir"/usr/bin/
 	done
@@ -75,11 +74,12 @@ tshark() {
 	mv "$pkgdir"/usr/bin/tshark "$subpkgdir"/usr/bin/tshark
 }
 
-qt() {
-	pkgdesc="wireshark - Qt GUI"
+gtk() {
+	pkgdesc="wireshark - GTK GUI"
 	install -d "$subpkgdir"/usr/bin
-	mv "$pkgdir"/usr/bin/wireshark-qt "$subpkgdir"/usr/bin/
+	mv "$pkgdir"/usr/bin/wireshark-gtk "$subpkgdir"/usr/bin/
 }
-md5sums="988a4595a4a87dafb3c4870ea40e89b5  wireshark-1.12.8.tar.bz2"
-sha256sums="357e0a4e49525d80cdc740bb16539fcdb526ad38cc2ed6cabedafc9bdee5c7e7  wireshark-1.12.8.tar.bz2"
-sha512sums="24ad130d9d0718e610f7def2a08e976871205032b4b4b5269c3ae54894c4121fa3b21a0bc6e45e9c2a41119f5553416d5c452dadf7b02f17e7803511d33809f5  wireshark-1.12.8.tar.bz2"
+
+md5sums="204d053e0796c7da09292e0b54bc8503  wireshark-2.0.2.tar.bz2"
+sha256sums="e921fb072085a5654d899949bb561d0687f4819f7b63ba35777bb949a9b6b9c1  wireshark-2.0.2.tar.bz2"
+sha512sums="a3645f0c2600091d3af76d12db4b73f83e6af4686a1bd7a336a420e4d7505ed281dfabb05c05cd6f58084fa3f25b6b9014b6f273b875c713ee39c77b4c5c715f  wireshark-2.0.2.tar.bz2"

@@ -1,0 +1,82 @@
+# Contributor: David Huffman <storedbox@outlook.com>
+# Maintainer: David Huffman <storedbox@outlook.com>
+
+pkgname=libtbb
+pkgver=4.4.3
+_pkgverstr=tbb44_20160128oss
+pkgrel=0
+pkgdesc="Intel® TBB, a widely used C++ template library for task parallelism"
+url="https://threadingbuildingblocks.org"
+arch="x86 x86_64"
+license="GPL2"
+subpackages="$pkgname-debug $pkgname-dev $pkgname-doc"
+source="https://www.threadingbuildingblocks.org/sites/default/files/software_releases/source/${_pkgverstr}_src.tgz"
+
+_builddir="$srcdir/$_pkgverstr"
+prepare() {
+	local i
+	cd "$_builddir"
+	for i in "$startdir"/*; do
+		case $i in
+		*.patch) msg $i; patch --verbose -p1 -i $i || return 1;;
+		esac
+	done
+}
+
+build() {
+	cd "$_builddir"
+	make || return 1
+}
+
+_install_libs() {
+	local buildtype libsuffix lib builddir
+	buildtype="_$1"
+	libsuffix="$2"
+	lib="${3:-$subpkgdir}/usr/lib"
+	builddir=$(find "$_builddir/build" -maxdepth 1 -name "*$buildtype" -type d) || return 1
+	[ "$buildtype" != "_debug" ] && buildtype=''
+	mkdir -p "$lib" || return 1
+	mv "$builddir/libtbb${buildtype}.so$libsuffix" \
+	   "$builddir/libtbbmalloc${buildtype}.so$libsuffix" \
+	   "$builddir/libtbbmalloc_proxy${buildtype}.so$libsuffix" \
+	   "$lib/" || return 1
+}
+
+package() {
+	_install_libs release .2 "$pkgdir" || return 1
+}
+
+debug() {
+	pkgdesc="$pkgdesc (debug symbols)"
+	
+	_install_libs debug .2 || return 1
+}
+
+dev() {
+	pkgdesc="$pkgdesc (development files)"
+	
+	local prefix
+	prefix="$subpkgdir/usr"
+	cd "$_builddir"
+	mkdir -p "$prefix" || return 1
+	rm include/index.html && mv include "$prefix/" || return 1
+	_install_libs release && _install_libs debug || return 1
+}
+
+doc() {
+	arch="noarch"
+	pkgdesc="$pkgdesc (documentation)"
+	
+	local share doc licenses
+	share="$subpkgdir/usr/share"
+	doc="$share/doc"
+	licensesdir="$share/licenses/$pkgname"
+	cd "$_builddir"
+	mkdir -p "$doc" "$licensesdir" || return 1
+	mv doc/ "$doc/$pkgname-$pkgver" || return 1
+	mv COPYING "$licensesdir/" || return 1
+}
+
+md5sums="9d8a4cdf43496f1b3f7c473a5248e5cc  tbb44_20160128oss_src.tgz"
+sha256sums="8d256bf13aef1b0726483af9f955918f04e3de4ebbf6908aa1b0c94cbe784ad7  tbb44_20160128oss_src.tgz"
+sha512sums="bb2c318039836791037060b7ed81dc75df8d9572d930818fc25c9c49e9a3130823f12f6371e05aeafdc59030ef19e2f7209d41e06bd3126696fc5ce87df3dfdf  tbb44_20160128oss_src.tgz"

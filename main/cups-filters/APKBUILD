@@ -1,22 +1,28 @@
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=cups-filters
-pkgver=1.0.76
-pkgrel=1
+pkgver=1.8.1
+pkgrel=0
 pkgdesc="OpenPrinting CUPS filters and backends"
 url="http://www.linuxfoundation.org/collaborate/workgroups/openprinting/pdf_as_standard_print_job_format"
 arch="all"
 license="GPLv2 and GPLv2+ and GPLv3 and MIT"
-# textonly is a bash script
+# while textonly is originally a bash script, it only needs a few changes
+# to work with any shell (dash being the problematic one)
+# foomatic-rip needs "a modern shell" in case the PPD requires some
+# newer constructs; bash, ksh, and zsh are documented as working,
+# and busybox ash supports most of what bash does
 # texttops/textopdf need FreeMono from ttf-freefont
 # for text printing to work
-depends="poppler-utils bc bash ttf-freefont"
+depends="poppler-utils bc ttf-freefont"
 depends_dev=""
 makedepends="$depends_dev cups-dev libjpeg-turbo-dev poppler-dev zlib-dev
 	libpng-dev tiff-dev lcms-dev freetype-dev ghostscript-dev fontconfig-dev
 	qpdf-dev avahi-dev dbus-dev linux-headers"
 install=""
 subpackages="$pkgname-dev $pkgname-doc $pkgname-libs"
-source="http://www.openprinting.org/download/cups-filters/cups-filters-$pkgver.tar.xz"
+source="http://www.openprinting.org/download/cups-filters/cups-filters-$pkgver.tar.xz
+	0001-Make-textonly-conform-with-POSIX-better.patch
+	"
 
 _builddir="$srcdir"/cups-filters-$pkgver
 prepare() {
@@ -41,6 +47,7 @@ build() {
 		--localstatedir=/var \
 		--disable-static \
 		--with-pdftops=pdftops \
+		--with-shell=/bin/sh \
 		--without-rcdir \
 		--without-rclevels \
 		|| return 1
@@ -69,6 +76,9 @@ libs() {
 	mv "$pkgdir"/usr/lib/lib*.so.* "$subpkgdir"/usr/lib/
 }
 
-md5sums="92e14b4f52a320c8d8b8176918bd4a8c  cups-filters-1.0.76.tar.xz"
-sha256sums="b3a190b11a102af6994e41d2cfa47e5caf999c7d046f3c0b940f6b38729f5b32  cups-filters-1.0.76.tar.xz"
-sha512sums="1c438ffc10551b79468f7f850e8f036defaa9c2e1114153107ff909904f25786c36635ea29cb8b07a2d6df37ab2e68bd91731d783e279f1a36decba9204baf7d  cups-filters-1.0.76.tar.xz"
+md5sums="4c4a10b7cbc20f6f6ee5d05d7561399d  cups-filters-1.8.1.tar.xz
+b65f5b5191fee1834623b6aedf7f5c50  0001-Make-textonly-conform-with-POSIX-better.patch"
+sha256sums="4e7d8953f910b7a992471d641590964c20f26da5d94c10de932dde4f5c03e91e  cups-filters-1.8.1.tar.xz
+33f5589e8c8fc98d9715c3a1b93c459c5902ff7115804852f79bbcc1638d6cb3  0001-Make-textonly-conform-with-POSIX-better.patch"
+sha512sums="9b254dbcc90df335b8162495f5c2846f77c8006128458e54753877d0b5e6b1d696ae28378b4b9a8275626d7f537651e1cb55aac67588ee5fa319898912dd9e08  cups-filters-1.8.1.tar.xz
+522f431e0a531b797a2f8626c22b711adce59c68564c3146db4c684ea81c51a265e8915b3e6148e1771a0bbd42d3bc6dd741793562cc145c52945658e43335b5  0001-Make-textonly-conform-with-POSIX-better.patch"

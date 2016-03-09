@@ -1,7 +1,7 @@
+# Maintainer: Laurent Bercot <ska-devel@skarnet.org>
 # Contributor: John Regan <john@jrjrtech.com>
-# Maintainer: John Regan <john@jrjrtech.com>
 pkgname=s6
-pkgver=2.2.3.1
+pkgver=2.2.4.3
 pkgrel=0
 pkgdesc="skarnet.org's small & secure supervision software suite."
 url="http://skarnet.org/software/$pkgname/"
@@ -11,7 +11,7 @@ depends="skalibs execline"
 depends_dev="skalibs-dev execline-dev"
 makedepends="$depends_dev"
 install=""
-subpackages="$pkgname-dev"
+subpackages="$pkgname-dev $pkgname-doc"
 source="http://skarnet.org/software/$pkgname/$pkgname-$pkgver.tar.gz"
 
 _builddir="$srcdir/$pkgname-$pkgver"
@@ -28,13 +28,13 @@ prepare() {
 build() {
 	cd "$_builddir"
 	./configure \
-		--build=$CBUILD \
 		--host=$CHOST \
 		--enable-shared \
 		--enable-static \
 		--disable-allstatic \
-		--prefix=/usr \
 		--libdir=/usr/lib \
+		--libexecdir="/lib/$pkgname" \
+		--with-dynlib=/lib \
 		|| return 1
 	make || return 1
 }
@@ -44,6 +44,12 @@ package() {
 	make DESTDIR="$pkgdir" install || return 1
 }
 
-md5sums="461f4c169bcb00ad668a9f6180489a4c  s6-2.2.3.1.tar.gz"
-sha256sums="56c5df1be85458b10ce293a710727be9bb78e6b123484e488ca484c6bc392303  s6-2.2.3.1.tar.gz"
-sha512sums="9bcc4af5133501f9c904b7d856506ac606532bf62a96b3fb6d686c44136953254d9bbac90519cacc101164bad95add16e662a1c6612e07f4988a44ddf25d93d5  s6-2.2.3.1.tar.gz"
+doc() {
+	default_doc
+	mkdir -p "$subpkgdir/usr/share/doc"
+	cp -a "$_builddir/doc" "$subpkgdir/usr/share/doc/$pkgname"
+}
+
+md5sums="b2c6581cb72a9d6c72f3c7499cbe582a  s6-2.2.4.3.tar.gz"
+sha256sums="f584ec56d5f2a3a2d81698d5f744b9b64d8fb6c22b56649faa71f3b62da7db3f  s6-2.2.4.3.tar.gz"
+sha512sums="af2f06d31eeba3efeaa93e1df6afc50051eb4b13b034d24750314e0d7e9277953595cd04134eecbe239c0ea633e2242712d193a23389a3c1206a81bf7438b5bb  s6-2.2.4.3.tar.gz"

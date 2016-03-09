@@ -1,33 +1,28 @@
+# Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=pax-utils
-pkgver=0.9.1
+pkgver=1.1.6
 pkgrel=0
 pkgdesc="ELF related utils for ELF 32/64 binaries"
-url="http://hardened.gentoo.org/pax-utils.xml"
+url="https://wiki.gentoo.org/wiki/Hardened/PaX_Utilities"
 arch="all"
-license='GPL2'
+license="GPL2"
 depends="scanelf"
-makedepends=
-source="http://dev.gentoo.org/~vapier/dist/pax-utils-$pkgver.tar.xz"
+makedepends="linux-headers libcap-dev"
+source="http://distfiles.gentoo.org/distfiles/${pkgname}-${pkgver}.tar.xz"
 subpackages="$pkgname-doc scanelf:_scanelf"
 
-_builddir="$srcdir"/pax-utils-$pkgver
-prepare() {
-	cd "$_builddir"
-	for i in $source; do
-		case $i in
-		*.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
-		esac
-	done
-}
+_builddir="$srcdir"/$pkgname-$pkgver
 build() {
 	cd "$_builddir"
-	make || return 1
+	make USE_CAP=yes || return 1
 }
 
 package() {
 	cd "$_builddir"
 	make DESTDIR="$pkgdir/" install || return 1
+
+	# Don't conflict with main/lddtree
 	rm -f "$pkgdir"/usr/bin/lddtree
 }
 
@@ -39,6 +34,6 @@ _scanelf() {
 	mv "$pkgdir"/usr/bin/scanelf "$subpkgdir"/usr/bin/
 }
 
-md5sums="e47c9c59832e99fe9793d23610e3462c  pax-utils-0.9.1.tar.xz"
-sha256sums="643ccaf6952f836c42aafcd5ad7e5f7de2d3472225a34603680b151a8b198b0c  pax-utils-0.9.1.tar.xz"
-sha512sums="718cf371a2b14333fcc47e7c250ba4996bc2f4b3cab3373524215c74cdf979669cfd47b48f1b08214fb958e65e7ce83ecd74bd855f5e008d235fa6c4c57dad8e  pax-utils-0.9.1.tar.xz"
+md5sums="96f56a5a10ed50f2448c5ccebd27764f  pax-utils-1.1.6.tar.xz"
+sha256sums="f5436c517bea40f7035ec29a6f34034c739b943f2e3a080d76df5dfd7fd41b12  pax-utils-1.1.6.tar.xz"
+sha512sums="c5bdb3ee076c5f4d026f811a59329014c539e3bb3ab45aec92564dcc4abcedaebc50bec55c37aeccfe9e31c554ec7789426fcb3d6f67a8d805843f32c5993f94  pax-utils-1.1.6.tar.xz"

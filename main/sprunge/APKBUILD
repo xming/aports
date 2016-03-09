@@ -1,7 +1,7 @@
 # Contributor: Natanael Copa <ncopa@alpinelinux.org>
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=sprunge
-pkgver=0.4
+pkgver=0.6
 pkgrel=0
 pkgdesc="Helper script to paste things to http://sprunge.us"
 url="http://sprunge.us"
@@ -10,38 +10,53 @@ license="GPLv2"
 depends="curl"
 makedepends=
 install=""
-subpackages=
+subpackages="tpaste dpaste ix"
 source=""
 
 _builddir="$srcdir"
+
 prepare() {
 	return 0
 }
 
 build() {
 	cd "$_builddir"
-	cat >"$_builddir"/sprunge<<EOF
-#!/bin/sh
-
-case \${0##*/} in
-	sprunge)
-		exec curl -F 'sprunge=<-' http://sprunge.us;;
-	tpaste)
-		exec curl -F 'tpaste=<-' http://tpaste.us;;
-	dpaste)
-		exec curl --silent -F 'content=<-' https://dpaste.de/api/ \
-			| sed -e 's/"//g' -e 's/\$/\/raw\n/';;
-	ix)
-		exec curl $opts -F f:1='<-' ix.io/;;
-esac
-EOF
 }
 
 package() {
 	cd "$_builddir"
-	install -Dm755 sprunge "$pkgdir"/usr/bin/sprunge || return 1
-	for i in tpaste dpaste ix; do
-		ln -s sprunge "$pkgdir"/usr/bin/$i || return 1
-	done
+	mkdir -p "$pkgdir"/usr/bin
+	printf "#!/bin/sh\n\nexec curl -F 'sprunge=<-' http://sprunge.us" > \
+		"$pkgdir"/usr/bin/sprunge || return 1
+	chmod 755 "$pkgdir"/usr/bin/sprunge || return 1
 }
 
+tpaste() {
+	cd "$_builddir"
+	url="http://tpaste.us"
+	pkgdesc="Helper script to paste things to $url"
+	mkdir -p "$subpkgdir"/usr/bin
+	printf "#!/bin/sh\n\nexec curl -F 'tpaste=<-' http://tpaste.us" > \
+		"$subpkgdir"/usr/bin/tpaste || return 1
+	chmod 755 "$subpkgdir"/usr/bin/tpaste || return 1
+}
+
+dpaste() {
+	cd "$_builddir"
+	url="http://dpaste.com"
+	pkgdesc="Helper script to paste things to $url"
+	mkdir -p "$subpkgdir"/usr/bin
+	printf "#!/bin/sh\n\nexec curl --silent -F 'content=<-' https://dpaste.de/api/ | sed -e 's/\"//g' -e 's/\$/\/raw\\\n/'" > \
+		"$subpkgdir"/usr/bin/dpaste || return 1
+	chmod 755 "$subpkgdir"/usr/bin/dpaste || return 1
+}
+
+ix() {
+	cd "$_builddir"
+	url="http://ix.io"
+	pkgdesc="Helper script to paste things to $url"
+	mkdir -p "$subpkgdir"/usr/bin
+	printf "#!/bin/sh\n\nexec curl -F f:1='<-' ix.io/" > \
+		 "$subpkgdir"/usr/bin/ix || return 1
+	chmod 755 "$subpkgdir"/usr/bin/ix || return 1
+}

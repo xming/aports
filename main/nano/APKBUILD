@@ -1,8 +1,8 @@
 # Contributor: Michael Mason <ms13sp@gmail.com>
 # Maintainer: Michael Zhou <zhoumichaely@gmail.com>
 pkgname=nano
-pkgver=2.4.2
-pkgrel=1
+pkgver=2.5.3
+pkgrel=0
 pkgdesc="Text Editor. GNU nano is designed to be a free replacement for the Pico text editor."
 url="http://www.nano-editor.org/"
 arch="all"
@@ -10,12 +10,11 @@ license="GPL"
 depends=
 makedepends="ncurses-dev"
 install=
-subpackages="$pkgname-doc"
+subpackages="$pkgname-doc $pkgname-syntax"
 source="http://www.nano-editor.org/dist/v${pkgver%.*}/$pkgname-$pkgver.tar.gz
 	"
 
-_builddir="$srcdir/$pkgname-$pkgver"
-
+_builddir="$srcdir"/$pkgname-$pkgver
 prepare() {
 	cd "$_builddir"
 	for i in $source; do
@@ -27,7 +26,6 @@ prepare() {
 
 build() {
 	cd "$_builddir"
-
 	./configure \
 		--build=$CBUILD \
 		--host=$CHOST \
@@ -43,12 +41,24 @@ build() {
 package() {
 	cd "$_builddir"
 	make DESTDIR="$pkgdir" install
+	install -Dm644 doc/nanorc.sample \
+		"$pkgdir"/etc/nanorc || return 1
 
-	mkdir -p "$pkgdir"/etc
-	cp "$srcdir/$pkgname-$pkgver"/doc/nanorc.sample "$pkgdir"/etc/nanorc
-	sed -i 's:# include:include:g' "$pkgdir"/etc/nanorc
+	# Proper syntax highlighting for APKBUILDs
+	sed -i "/syntax/s/\"$/\" \"APKBUILD&/" \
+		"$pkgdir"/usr/share/nano/sh.nanorc || return 1
 }
 
-md5sums="ce6968992fec4283c17984b53554168b  nano-2.4.2.tar.gz"
-sha256sums="c8cd7f18fcf5696d9df3364ee2a840e0ab7b6bdbd22abf850bbdc951db7f65b9  nano-2.4.2.tar.gz"
-sha512sums="487b03b33ac8fac4a774223e038b00463ca03e08093c506b10f4df56795039eff1c23518c1a4f32695cee1bb9bb5eb0a2dd3e1f8a9befcc573e7fca3d69fa9d3  nano-2.4.2.tar.gz"
+syntax() {
+	pkgdesc="Syntax highlighting definitions for $pkgname"
+	arch="noarch"
+	depends=""
+
+	mkdir -p "$subpkgdir"/usr/share/$pkgname/
+	mv "$pkgdir"/usr/share/$pkgname/*.nanorc \
+		"$subpkgdir"/usr/share/$pkgname/ || return 1
+}
+
+md5sums="a04d77611422ab4b6a7b489650c7a793  nano-2.5.3.tar.gz"
+sha256sums="b2b060129b9feff2d4870d803a441178c96531de9aed144ec0b83bd63ccb12ee  nano-2.5.3.tar.gz"
+sha512sums="1d859f0bd88b9d907cfcaa84edc212bcaea4335c203922eb5b7378c2b45d88dffe1f3e4cb499a824d33781485834ef564997c58cf1fd92610d08f6ce8dcb67d5  nano-2.5.3.tar.gz"

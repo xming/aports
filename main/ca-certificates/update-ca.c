@@ -15,6 +15,7 @@
 #define CERTSDIR "/usr/share/ca-certificates/"
 #define LOCALCERTSDIR "/usr/local/share/ca-certificates/"
 #define ETCCERTSDIR "/etc/ssl/certs/"
+#define RUNPARTSDIR "/etc/ca-certificates/update.d/"
 #define CERTBUNDLE "ca-certificates.crt"
 #define CERTSCONF "/etc/ca-certificates.conf"
 
@@ -316,13 +317,11 @@ int main(int a, char **v)
 
 	free(tmpfile);
 
-	/* Execute c_rehash */
-	int nullfd = open("/dev/null", O_WRONLY);
-	if (nullfd == -1)
-		return 1;
-	dup2(nullfd, STDOUT_FILENO);
-	char* c_rehash_args[] = { "/usr/bin/c_rehash", ETCCERTSDIR, 0 };
-	execve(c_rehash_args[0], c_rehash_args, NULL);
+	/* Execute run-parts */
+	static const char *run_parts_args[] = { "run-parts", RUNPARTSDIR, 0 };
+	execve("/usr/bin/run-parts", run_parts_args, NULL);
+	execve("/bin/run-parts", run_parts_args, NULL);
+	perror("run-parts");
 
-	return 0;
+	return 1;
 }

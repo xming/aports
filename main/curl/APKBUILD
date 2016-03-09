@@ -1,7 +1,8 @@
+# Contributor: Valery Kartel <valery.kartel@gmail.com>
 # Contributor: Łukasz Jendrysik <scadu@yandex.com>
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=curl
-pkgver=7.45.0
+pkgver=7.47.1
 pkgrel=0
 pkgdesc="An URL retrival utility and library"
 url="http://curl.haxx.se"
@@ -9,12 +10,11 @@ arch="all"
 license="MIT"
 depends="ca-certificates"
 depends_dev="zlib-dev openssl-dev libssh2-dev"
-makedepends="groff $depends_dev"
-source="http://curl.haxx.se/download/curl-$pkgver.tar.bz2"
-subpackages="$pkgname-doc $pkgname-dev"
+makedepends="$depends_dev groff perl"
+source="http://curl.haxx.se/download/$pkgname-$pkgver.tar.bz2"
+subpackages="$pkgname-doc $pkgname-dev libcurl $pkgname-zsh-completion:zshcomp"
 
-_builddir="$srcdir/$pkgname-$pkgver"
-
+_builddir="$srcdir"/$pkgname-$pkgver
 prepare() {
 	local i
 	cd "$_builddir"
@@ -24,16 +24,19 @@ prepare() {
 		esac
 	done
 }
+
 build() {
 	cd "$_builddir"
 	./configure \
 		--build=$CBUILD \
 		--host=$CHOST \
 		--prefix=/usr \
-		--mandir=/usr/share/man \
-		--without-libidn \
 		--enable-ipv6 \
+		--enable-unix-sockets \
+		--without-libidn \
+		--disable-static \
 		--disable-ldap \
+		--with-pic \
 		|| return 1
 	make || return 1
 }
@@ -43,6 +46,21 @@ package() {
 	make DESTDIR="$pkgdir" install || return 1
 }
 
-md5sums="62c1a352b28558f25ba6209214beadc8  curl-7.45.0.tar.bz2"
-sha256sums="65154e66b9f8a442b57c436904639507b4ac37ec13d6f8a48248f1b4012b98ea  curl-7.45.0.tar.bz2"
-sha512sums="71c557c69eb8d160f74a9b76ef83a46ce33ef4e8a66a261699329583dadf10205b4ba4783f92d4e6c8724f6610ffade5b0a9f189b0a7b9169ff839dfc8980481  curl-7.45.0.tar.bz2"
+libcurl() {
+	pkgdesc="The multiprotocol file transfer library"
+	mkdir -p "$subpkgdir"/usr
+	mv "$pkgdir"/usr/lib "$subpkgdir"/usr
+}
+
+zshcomp() {
+	pkgdesc="Zsh completion for $pkgname"
+	arch="noarch"
+	depends=""
+	install_if="$pkgname=$pkgver-r$pkgrel zsh"
+	mkdir -p "$subpkgdir"/usr/share
+	mv "$pkgdir"/usr/share/zsh "$subpkgdir"/usr/share
+}
+
+md5sums="9ea3123449439bbd960cd25cf98796fb  curl-7.47.1.tar.bz2"
+sha256sums="ddc643ab9382e24bbe4747d43df189a0a6ce38fcb33df041b9cb0b3cd47ae98f  curl-7.47.1.tar.bz2"
+sha512sums="e99d94dfdd349df0603de21687039c69765d40ae6bd73bd8ccdb6d046903a94e590a9cc903f378f8d030997a29bf0394ac5e342c9989a815679f9ea4fa79913f  curl-7.47.1.tar.bz2"

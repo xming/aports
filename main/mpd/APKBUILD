@@ -3,23 +3,24 @@
 # Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
 # Maintainer: Carlo Landmeter <clandmeter@alpinelinux.org>
 pkgname=mpd
-pkgver=0.19.11
+pkgver=0.19.13
 case $pkgver in
 *.*.*) _branch=${pkgver%.*};;
 *.*) _branch=$pkgver;;
 esac
-pkgrel=1
+pkgrel=0
 pkgdesc="Music daemon that plays MP3, FLAC, and Ogg Vorbis files"
 url="http://musicpd.org"
 pkgusers="mpd"
 pkggroups="mpd audio"
 arch="all"
 license="GPL2"
-depends=
+depends=""
 makedepends="lame-dev glib-dev curl-dev libao-dev libmad-dev flac-dev
 	libogg-dev faad2-dev libid3tag-dev libvorbis-dev alsa-lib-dev
 	libsamplerate-dev libshout-dev libmodplug-dev boost-dev icu-dev
-	libnfs-dev samba-dev autoconf automake libtool"
+	libnfs-dev samba-dev opus-dev
+	autoconf automake libtool"
 install="$pkgname.pre-install"
 subpackages="$pkgname-doc $pkgname-dbg"
 source="http://www.musicpd.org/download/mpd/$_branch/mpd-$pkgver.tar.xz
@@ -30,7 +31,6 @@ source="http://www.musicpd.org/download/mpd/$_branch/mpd-$pkgver.tar.xz
 	mpd.confd"
 
 _builddir="$srcdir/$pkgname-$pkgver"
-
 prepare() {
 	cd "$_builddir"
 	for i in $source; do
@@ -52,6 +52,7 @@ build() {
 		--mandir=/usr/share/man \
 		--infodir=/usr/share/info \
 		--enable-shout \
+		--enable-opus \
 		--enable-modplug \
 		--enable-nfs \
 		--enable-smbclient \
@@ -61,39 +62,41 @@ build() {
 
 package() {
 	cd "$_builddir"
-	make DESTDIR="$pkgdir" install
+	make DESTDIR="$pkgdir" install || return 1
 
-	#provide a config that works by default
+	# provide a config that works by default
 	install -d "$pkgdir"/etc
 	sed -e 's:\#pid_file.*:pid_file\t\t"/var/run/mpd/mpd.pid":' \
 		-e 's:\#user.*:user\t\t"mpd":' \
 		-e 's:\#log_file.*:log_file\t\t"syslog":' \
 		doc/mpdconf.example > "$pkgdir"/etc/mpd.conf
-
-	install -m755 -D "$srcdir"/$pkgname.initd "$pkgdir"/etc/init.d/$pkgname
-	install -m644 -D "$srcdir"/$pkgname.confd "$pkgdir"/etc/conf.d/$pkgname
+	install -m755 -D "$srcdir"/$pkgname.initd \
+		"$pkgdir"/etc/init.d/$pkgname || return 1
+	install -m644 -D "$srcdir"/$pkgname.confd \
+		"$pkgdir"/etc/conf.d/$pkgname || return 1
 	install -d -g audio -o mpd -m775 \
 		"$pkgdir"/var/run/mpd \
 		"$pkgdir"/var/log/mpd \
+		"$pkgdir"/var/lib/mpd \
 		"$pkgdir"/var/lib/mpd/playlists \
-		"$pkgdir"/var/lib/mpd/music
+		"$pkgdir"/var/lib/mpd/music || return 1
 }
 
-md5sums="78935f6c464b67e19b4dc65bdb80319e  mpd-0.19.11.tar.xz
+md5sums="016c93fc3d78bfb92e896445f04ea741  mpd-0.19.13.tar.xz
 a84cce5fdb848c7d282e38698432df51  underlinking.patch
 97e6eab066fc610e6e3a3b2263a6d5ba  musl-gcc5-fixes.patch
 b0c5da8706963a5ae910ff604eb87e2b  stacksize.patch
-69f9df7ba92ac3f6c46a4a30a2a5c025  mpd.initd
+afe7a40ac52e4619e5d755b3523132a8  mpd.initd
 dbd301041953a5cf9c2b9de8f23eb6bb  mpd.confd"
-sha256sums="7a5c66aa5af97a5b7af3dc49e3d2594071dafd62a14e2e9f7c9a5a86342836c6  mpd-0.19.11.tar.xz
+sha256sums="f1014838fa7ab2d5fe2ef7f4c101d58fdec2c4c13cfbd2462ee146c8e4919a55  mpd-0.19.13.tar.xz
 b3a0499cbd3f759612ad94fce00588d97e5e82af0b2bcc560869eb977067a426  underlinking.patch
 f8be8d5f00576e4734d44d3ee2ad2ddd55351c25eee5a545573a264304514db9  musl-gcc5-fixes.patch
 7ae663ecc08498e1d822349cf580eb738f43218308ae0b75efe128276f8ab98a  stacksize.patch
-9d842c202c010b7254dc89971649139b81bfec49f11c19bcba8be8712279ba7b  mpd.initd
+e6eb40494f583f8b22ef5dc9c4f871220ddd483f1e67cb3bf7eae31eba331479  mpd.initd
 32c072f77c23c2cc2dd7c93b65b73015e0587caaf2740856132af32cee623206  mpd.confd"
-sha512sums="3ad505a75651facd141efbb43ebb86a9f1b66a0bc044d39c9131068fc20d05037ad449935fd6fc20917dfd690cdc256c1d1deb7427039d2345b13bea2b2eb66e  mpd-0.19.11.tar.xz
+sha512sums="32125963aa1d808b65dc9b19141044e924f5fbcb635435b250d64f25b6bd69c3069d8db013de34bf5cc601951c952c930e5c88e64609e91ee858853e58140725  mpd-0.19.13.tar.xz
 d6a98c5f60a60ddd5fa94b25864f800a6a6fb6ffe114793293d0ccc71bb5d1cdb847ca39fde4128446b55a38be85634106d5d6f2c77ee450f33631b30140781a  underlinking.patch
 5140ad3eb13b5e141e9b9909ad27ae2a08ac7556b3ff23f97a65ae6dc20f3856a0376b85fe8e90eb37b8fbaccd0c1002b4bc788d0abcb7541c95713e1cc98a3a  musl-gcc5-fixes.patch
 f425c20e18207a406f84a6a664f02625fca9d42977b1289f4ba8595406b26f6aa73b4f1cb5a1115858cb75fa7844f42d7174adba3f6af1af216c44901a1ccaa0  stacksize.patch
-8b13530fbfb2bded3cb82202261d57ff824521e5682f07c8f3d0562348aeb303e6c3d72a457043c4d4909d7106d723fe701a12ab66b45b016d3b940acbeb205b  mpd.initd
+3725a528a45edf60e6a9ebd75c880aa63d0e71ab40c20dbc538af2d7c83ca657833b6853d9b488d635883fb7871bb76fada129b3bf8acff4bb060f98a5ad8774  mpd.initd
 41b2467f5b03f5c4dd7003cd5f56f6cfc1f67af7a9aa2538d70360f839625222bdd0c4b04c33e8cd52eeecfc354da3ca22f5aaab8aee357a5774aaf3503594e7  mpd.confd"

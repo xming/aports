@@ -1,7 +1,7 @@
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=cmake
-pkgver=3.3.2
-pkgrel=1
+pkgver=3.4.3
+pkgrel=0
 pkgdesc="CMake is a cross-platform open-source make system"
 url="http://www.cmake.org"
 arch="all"
@@ -16,7 +16,6 @@ case $pkgver in
 esac
 
 source="http://www.cmake.org/files/$_v/cmake-${pkgver}.tar.gz
-	musl-header-fixes.patch
 	"
 
 _builddir="$srcdir/$pkgname-$pkgver"
@@ -60,9 +59,6 @@ package() {
 	make DESTDIR="$pkgdir" install
 }
 
-md5sums="5febbd11bcaac854a27eebaf4a124be2  cmake-3.3.2.tar.gz
-500d40f006182e7f4e3e594347882fdf  musl-header-fixes.patch"
-sha256sums="e75a178d6ebf182b048ebfe6e0657c49f0dc109779170bad7ffcb17463f2fc22  cmake-3.3.2.tar.gz
-7169e21d649b35c031a615986ebc559d772d40667506ce495cbc51f828825ae8  musl-header-fixes.patch"
-sha512sums="01bc0e6ca52a6836ef57360fb38dd92a4575bfa37bfe9625645db77fefd0c170383cfb07b61c6283bde96738ce1a5e18cb7569e7e0b7c98d4b99e86305c50180  cmake-3.3.2.tar.gz
-36ec0e51b4b1f00f8d7439d3e5a39ee8882704f69ec1ca901010ffba4914e7949aefafdb6698c28b966d5bccfa209aca993c228a37189ced047203d02644127c  musl-header-fixes.patch"
+md5sums="4cb3ff35b2472aae70f542116d616e63  cmake-3.4.3.tar.gz"
+sha256sums="b73f8c1029611df7ed81796bf5ca8ba0ef41c6761132340c73ffe42704f980fa  cmake-3.4.3.tar.gz"
+sha512sums="a326c39cfe9f5408b4586ddd291cabfa400a2442947fb46d94dd6c44db3087c48c84a9a22ca5ed38707467448150383935ed59c669fbbfb20a968d4031eaaa11  cmake-3.4.3.tar.gz"

@@ -2,7 +2,7 @@
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=py-django
 _pkgname=Django
-pkgver=1.8.4
+pkgver=1.8.8
 pkgrel=0
 pkgdesc="A high-level Python Web framework"
 url="http://djangoproject.com/"
@@ -23,9 +23,9 @@ build() {
 
 package() {
 	cd "$_builddir"
-	python setup.py install --root "$pkgdir" || return 1
+	python setup.py install --root "$pkgdir" --skip-build || return 1
 }
 
-md5sums="8eb569a5b9d984d9f3366fda67fb0bb8  Django-1.8.4.tar.gz"
-sha256sums="826996c81e1cc773500124d5c19212e4a7681a55ee169fab9085f2b3015a70d8  Django-1.8.4.tar.gz"
-sha512sums="34dee1d004f4b149bd8b0405bcad66c0b4ad68b3c0069b1631af2c457cbcc165d6a730d221777110525be74cf9369b695d4fc8d752317d0819fd338250222351  Django-1.8.4.tar.gz"
+md5sums="08ecf83b7e9d064ed7e3981ddc3a8a15  Django-1.8.8.tar.gz"
+sha256sums="8255242fa0d9e0bf331259a6bdb81364933acbe8863291661558ffdb2fc9ed70  Django-1.8.8.tar.gz"
+sha512sums="d7775ffb05840a73a99bf67d234580e135bc3d1b4c033ab3bf557e9bee42001fd309da7a8cf13cb99cac34cef0c4ef954903b5c90d2b4b40d084cfcaf05ba701  Django-1.8.8.tar.gz"

@@ -1,0 +1,68 @@
+# Contributor: Peter Bui <pnutzh4x0r@gmail.com>
+# Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
+# Contributor: Łukasz Jendrysik <scadu@yandex.com>
+# Contributor: Timo Teräs <timo.teras@iki.fi>
+# Maintainer: Timo Teräs <timo.teras@iki.fi>
+pkgname=youtube-dl
+pkgver=2016.01.29
+pkgrel=0
+pkgdesc="A small command-line program to download videos from YouTube."
+url="http://youtube-dl.org "
+arch="noarch"
+license="Public Domain"
+depends="python>=2.5 py-setuptools ffmpeg"
+subpackages="
+	$pkgname-doc
+	$pkgname-zsh-completion:zshcomp
+	$pkgname-bash-completion:bashcomp
+	$pkgname-fish-completion:fishcomp"
+source="http://$pkgname.org/downloads/$pkgver/$pkgname-$pkgver.tar.gz"
+
+_builddir="$srcdir"/$pkgname
+prepare() {
+	cd "$_builddir"
+	sed -i 's|etc/bash_completion.d|share/bash-completion/completions|' setup.py || return 1
+	sed -i 's|etc/fish/completions|share/fish/completions|' setup.py || return 1
+}
+
+package() {
+	cd "$_builddir"
+	python setup.py install --root="$pkgdir/" --optimize=1 || return 1
+	install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE" || return 1
+}
+
+zshcomp() {
+	depends=""
+	pkgdesc="Zsh completions for $pkgname"
+	install_if="$pkgname=$pkgver-r$pkgrel zsh"
+	arch="noarch"
+
+	install -Dm644 "$_builddir"/$pkgname.zsh \
+		"$subpkgdir"/usr/share/zsh/site-functions/_$pkgname || return 1
+}
+
+bashcomp() {
+	depends=""
+	pkgdesc="Bash completions for $pkgname"
+	install_if="$pkgname=$pkgver-r$pkgrel bash-completion"
+	arch="noarch"
+
+	mkdir -p "$subpkgdir"/usr/share/bash-completion/completions/
+	mv "$pkgdir"/usr/share/bash-completion/completions/$pkgname.bash-completion \
+		"$subpkgdir"/usr/share/bash-completion/completions/$pkgname || return 1
+}
+
+fishcomp() {
+	depends=""
+	pkgdesc="Fish completions for $pkgname"
+	install_if="$pkgname=$pkgver-r$pkgrel fish"
+	arch="noarch"
+
+	mkdir -p "$subpkgdir"/usr/share/fish/completions/
+	mv "$pkgdir"/usr/share/fish/completions/$pkgname.fish \
+		"$subpkgdir"/usr/share/fish/completions/ || return 1
+}
+
+md5sums="c7ead2a65174d07fd903557f67facafd  youtube-dl-2016.01.29.tar.gz"
+sha256sums="4b39800787d288c5f44cf00342d900d53386ef41c66a5397b406acac9fd60212  youtube-dl-2016.01.29.tar.gz"
+sha512sums="24f7646bd81040e16cbe66b5c67c35800799fef797b735c45e3f3c13cc5222c390484c452eedba2a42ba57dc3a88a153d7430bf0db378f6619191af1dfcfa4e8  youtube-dl-2016.01.29.tar.gz"

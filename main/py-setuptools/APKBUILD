@@ -2,7 +2,7 @@
 # Maintainer:  Fabian Affolter <fabian@affolter-engineering.ch>
 pkgname=py-setuptools
 _pkgname=${pkgname#py-}
-pkgver=1.1.7
+pkgver=20.1.1
 pkgrel=0
 pkgdesc="A collection of enhancements to the Python distutils"
 url="http://pypi.python.org/pypi/setuptools"
@@ -23,11 +23,11 @@ build() {
 package() {
 	cd "$_builddir"
 	python setup.py install --prefix=/usr --root="$pkgdir" || return 1
+
 	# we don't provide a non-suffixed easy_install
-	echo "Removing non-suffixed easy_install ( $pkgdir/usr/bin/easy_install)"
-	rm "$pkgdir"/usr/bin/easy_install
+	rm -f "$pkgdir"/usr/bin/easy_install || return 1
 }
 
-md5sums="1f33594d25d574a1640ffb84667c6759  setuptools-1.1.7.tar.gz"
-sha256sums="b35e3d7c79cfdb5b38cfc71f4b0deab4350c1176fc4bb05bfa8945504ecfb028  setuptools-1.1.7.tar.gz"
-sha512sums="a1528406a3a7ccd85e7b9b8befe2bb579477a5961027a20f3a8947789ed0f8f5b7ed439d3d860eb049eeb0617dcd8f932f1c841b64e3408c5d92ab0333db617e  setuptools-1.1.7.tar.gz"
+md5sums="10a0f4feb9f2ea99acf634c8d7136d6d  setuptools-20.1.1.tar.gz"
+sha256sums="2663ce0b0e742ee27c3a06b2da14563e4f6f713eaf5509b932a31793f9dea9a3  setuptools-20.1.1.tar.gz"
+sha512sums="72da2f5a4e07c14975b3e13246264cb4b9eb52bd6da22fce0ef0f0bb8d902249067e6c23bf263cda45de92a0cdb794f454dff95e52505045e03c7a6ab28cb2ca  setuptools-20.1.1.tar.gz"

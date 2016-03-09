@@ -2,10 +2,9 @@
 # Contributor: Francesco Colista <francesco.colista@gmail.com>
 # Maintainer: Francesco Colista <francesco.colista@gmail.com>
 pkgname=perl-test-simple
-_pkgreal=Test-Simple
-pkgver=0.98_p05
-_ver=${pkgver/_p/_}
-pkgrel=0
+pkgver=1.001014
+_pkgreal=Test-Simple-$pkgver
+pkgrel=1
 pkgdesc="Basic utilities for writing tests."
 url="http://search.cpan.org/dist/Test-Simple/"
 arch="noarch"
@@ -14,11 +13,10 @@ cpandepends=""
 cpanmakedepends=""
 depends="$cpandepends"
 makedepends="perl-dev $cpanmakedepends"
-subpackages="$pkgname-doc"
-source="http://search.cpan.org/CPAN/authors/id/M/MS/MSCHWERN/$_pkgreal-$_ver.tar.gz"
+subpackages=""
+source="http://search.cpan.org/CPAN/authors/id/E/EX/EXODIST/$_pkgreal.tar.gz"
 
-_builddir="$srcdir/$_pkgreal-$_ver"
-
+_builddir="$srcdir/$_pkgreal"
 prepare() {
 	cd "$_builddir"
 	PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor
@@ -33,8 +31,11 @@ package() {
 	cd "$_builddir"
 	make DESTDIR="$pkgdir" install || return 1
 	find "$pkgdir" \( -name perllocal.pod -o -name .packlist \) -delete
+
+	# man pages are already provided by perl-doc
+	rm -rf "$pkgdir"/usr/share/man || return 1
 }
 
-md5sums="2d51e2e69435dc666405b6a8b2265992  Test-Simple-0.98_05.tar.gz"
-sha256sums="bc70e8f3cab9a28a8ecbc4299f1703c7c5529c5b22222c28689dd89127f947a2  Test-Simple-0.98_05.tar.gz"
-sha512sums="ca4a77a5e5841ab6fb5d5ec8ff7bca6ec244c75ae267a6d85e8340204f109eb35ccc2fab1f30d06d2a98d2dd7687b7d908fcfad12041c15cdd4d1133a7359e5f  Test-Simple-0.98_05.tar.gz"
+md5sums="db7f57fd595e3e1c93c972307a88fa6e  Test-Simple-1.001014.tar.gz"
+sha256sums="55a414ce89eb7a5e9e84186f286b002054f10ae8ef4f8f2d61bb710e7549f16b  Test-Simple-1.001014.tar.gz"
+sha512sums="0aa0b4d78c0243480df0e7f9b28d69b6bbf1b26bd49a91827c2d61595319840f7178f179555a60ef28d49d3f50679aade4f6d8138e9ae1bd0113a3d6c66d89c2  Test-Simple-1.001014.tar.gz"

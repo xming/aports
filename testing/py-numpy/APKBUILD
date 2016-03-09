@@ -1,19 +1,20 @@
-# Contributor: Francesco Colista <francesco.colista@gmail.com>
-# Maintainer: Francesco Colista <francesco.colista@gmail.com>
+# Contributor: Francesco Colista <fcolista@alpinelinux.org>
+# Maintainer: Francesco Colista <fcolista@alpinelinux.org>
 pkgname=py-numpy
 _pkgname=numpy
-pkgver=1.9.2
+pkgver=1.10.4
 pkgrel=0
 pkgdesc="Scientific tools for Python"
 url="http://numpy.scipy.org/"
 arch="all"
 license="BSD"
 depends="gfortran"
-depends_dev="python-dev"
+depends_dev="python-dev openblas-dev py-setuptools py-nose cython-dev"
 makedepends="$depends_dev"
 install=""
 subpackages="$pkgname-dev $pkgname-doc"
 source="http://downloads.sourceforge.net/$_pkgname/$_pkgname-$pkgver.tar.gz
+	numpy-1.10.0-musl.patch
 	site.cfg"
 
 _builddir="$srcdir"/$_pkgname-$pkgver
@@ -43,9 +44,12 @@ package() {
 	install -m644 LICENSE.txt "$pkgdir"/usr/share/licenses/custom/$pkgname/LICENSE
 }
 
-md5sums="a1ed53432dbcd256398898d35bc8e645  numpy-1.9.2.tar.gz
+md5sums="90bb9034652cefbada19cf7d141a6a61  numpy-1.10.4.tar.gz
+e00075bed14f650030a8704db7fda6ee  numpy-1.10.0-musl.patch
 6f15bb8fe3d12faa8983a9e18bbea2a9  site.cfg"
-sha256sums="325e5f2b0b434ecb6e6882c7e1034cc6cdde3eeeea87dbc482575199a6aeef2a  numpy-1.9.2.tar.gz
+sha256sums="f7f91842056a7cf680b0eaf8cefc5e46c69e2521e651128d2e6aaaccec8652ae  numpy-1.10.4.tar.gz
+e4a84dab5561833299bb506acba2d1a5feea929af69bde56a10558612405f8ec  numpy-1.10.0-musl.patch
 8aa71c1aec2a9fdf6ab6167c92e86bdaf27f9a263b6b9849097ec7dcdf6d91a3  site.cfg"
-sha512sums="70470ebb9afef5dfd0c83ceb7a9d5f1b7a072b1a9b54b04f04f5ed50fbaedd5b4906bd500472268d478f94df9e749a88698b1ff30f2d80258e7f3fec040617d9  numpy-1.9.2.tar.gz
+sha512sums="2270fa25fb464e3bc83e009090dc6b42ed5be607ab747892cfb546aba0ce78c76c8e575fe1a21eccb6f4b1f81ab183cd919b52d6410fff7d03e767f07eb40233  numpy-1.10.4.tar.gz
+9f97a3f3e9890598444d78418cbc4aac75d06df8a10634bc94e8c346a70d3fb7efb45004cf0d5840646c7e72e2886234988ed01021b36ca87ed727470e44be75  numpy-1.10.0-musl.patch
 21ca8db304cbbf5949f07702f2a42bb5e5a0d641921e36649555a41b0e48f04e96f53760417823177ac27f6de24b2191e6e1d5f0eb393beafa29f7484e23284f  site.cfg"

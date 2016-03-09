@@ -1,6 +1,6 @@
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=librsvg
-pkgver=2.40.11
+pkgver=2.40.13
 pkgrel=0
 pkgdesc="SAX-based renderer for SVG files into a GdkPixbuf"
 url="http://live.gnome.org/LibRsvg"
@@ -44,6 +44,6 @@ package() {
 	rm -rf "$pkgdir"/usr/lib/mozilla || return 1
 }
 
-md5sums="6b9cd1a048210a8e95bdc04c85fe997f  librsvg-2.40.11.tar.xz"
-sha256sums="611ac0f544debd0c9bf1ef5509c990d218e83dd1d8c83297075c4b29796a2e02  librsvg-2.40.11.tar.xz"
-sha512sums="89fc4f94150ab47665ab1b6c26979c8072efe40dd74ff13284598cb63de8594e7cfe4b73a151e54002a4811b5de56b93f5d52215ef0862b994d230fafe04b4fc  librsvg-2.40.11.tar.xz"
+md5sums="ad03780e12c56e52474d8edf86976c73  librsvg-2.40.13.tar.xz"
+sha256sums="4d6ea93ec05f5dabe7262d711d246a0a99b2311e215360dd3dcabd6afe3b9804  librsvg-2.40.13.tar.xz"
+sha512sums="7549f78d25c3319b5b74803c46cc0d1bd5c53a425b632a5b306eb238080df0da2b4bcefb159064988bd56cb1d69e0c94ecd0a073315acff14abb187ba6d4c788  librsvg-2.40.13.tar.xz"

@@ -2,7 +2,7 @@
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=perl-io-socket-ssl
 _pkgreal=IO-Socket-SSL
-pkgver=2.010
+pkgver=2.021
 pkgrel=0
 pkgdesc="Nearly transparent SSL encapsulation for IO::Socket::INET."
 url="http://search.cpan.org/dist/IO-Socket-SSL/"
@@ -10,7 +10,7 @@ arch="noarch"
 license="GPL PerlArtistic"
 cpandepends="perl-net-ssleay"
 cpanmakedepends="   "
-depends="$cpandepends ca-certificates"
+depends="$cpandepends ca-certificates perl-net-libidn"
 makedepends="perl-dev $cpanmakedepends"
 subpackages="$pkgname-doc"
 source="http://search.cpan.org/CPAN/authors/id/S/SU/SULLR/$_pkgreal-$pkgver.tar.gz"
@@ -35,6 +35,6 @@ package() {
 	find "$pkgdir" \( -name perllocal.pod -o -name .packlist \) -delete
 }
 
-md5sums="69cad2edebf89c6c295fe8778a4f9906  IO-Socket-SSL-2.010.tar.gz"
-sha256sums="68491ad58eb28645ca1272657e9c77c4c8ae4a11d35fb630ead4b6157079503c  IO-Socket-SSL-2.010.tar.gz"
-sha512sums="2b7cfae231faa48899a0b36cefbb9e67e1036d8dd5da5d18832ee2c150b09e82f9d422dace2b752c1cba5b7aa5536dc993df63d3788c6ed3ec46a54a3025b2bf  IO-Socket-SSL-2.010.tar.gz"
+md5sums="124394b702ba5ccbbca9b6ee424a8bac  IO-Socket-SSL-2.021.tar.gz"
+sha256sums="5cc549326c6dbe43d02cf90211ccb88eb9a279339c23cf9e3e62128906399d6a  IO-Socket-SSL-2.021.tar.gz"
+sha512sums="9d97b11c17c16b615d6bd90e23e50fc17c6bce94b00eef8776cdd0da89924b32976085fd981d0472b7180cee2b9e1d82b438b5de5a98aaf78fc64c5d170ab712  IO-Socket-SSL-2.021.tar.gz"

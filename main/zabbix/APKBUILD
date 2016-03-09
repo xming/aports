@@ -3,8 +3,8 @@
 # Contributor: Leonardo Arena <rnalrd@alpinelinux.org>
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=zabbix
-pkgver=2.4.6
-pkgrel=1
+pkgver=3.0.1
+pkgrel=0
 pkgdesc="Enterprise-class open source distributed monitoring"
 url="http://www.zabbix.com"
 arch="all"
@@ -12,7 +12,7 @@ license="GPL"
 depends="fping"
 makedepends="postgresql-dev curl-dev net-snmp-dev
 	sqlite-dev mariadb-dev curl-dev openipmi-dev unixodbc-dev
-	libxml2-dev autoconf automake libssh2"
+	libxml2-dev autoconf automake libssh2 openssl-dev"
 install="$pkgname.pre-install"
 pkgusers="zabbix"
 pkggroups="zabbix"
@@ -26,7 +26,7 @@ source="http://downloads.sourceforge.net/$pkgname/$pkgname-$pkgver.tar.gz
 	zabbix-server.confd
 	zabbix-agentd.initd
 	zabbix-proxy.initd
-	002-fix-res_send-on-uclibc.patch
+	zabbix_server.conf.patch
 	"
 
 _builddir="$srcdir"/$pkgname-$pkgver
@@ -36,12 +36,6 @@ prepare() {
 	# update_config_sub || return 1
 	for i in $source; do
 		case $i in
-		*uclibc*.patch)
-			if [ "$CLIBC" == "uclibc" ]; then
-				msg "Applying $i"
-				patch -p1 -i "$srcdir"/$i || return 1
-			fi
-			;;
 		*eglibc*.patch)
 			if [ "$CLIBC" == "eglibc" ]; then
 				msg "Applying $i"
@@ -81,7 +75,8 @@ build() {
 			--with-libxml2 \
 			--with-openipmi \
 			--with-unixodbc \
-			--with-ssh2
+			--with-ssh2 \
+			--with-openssl
 			"
         # we run build for each db type
         # make sure prepare is same for each db
@@ -99,7 +94,6 @@ build() {
 		make || return 1
 	done
 }
-
 
 package() {
         # doing manual install
@@ -170,7 +164,7 @@ utils() {
 webif() {
 	arch="noarch"
 	pkgdesc="Zabbix web-interface"
-	depends="php php-pgsql php-gd php-curl php-bcmath php-sockets php-iconv
+	depends="php php-gd php-curl php-bcmath php-sockets php-iconv
 		php-xmlreader php-ctype php-gettext"
 	_wwwdir="$subpkgdir"/usr/share/webapps/zabbix
 	mkdir -p $_wwwdir
@@ -195,7 +189,7 @@ agent() {
 
 }
 
-md5sums="06ad8d5808a0eddf2b9f0a256b6a5fde  zabbix-2.4.6.tar.gz
+md5sums="890d9eec69304ad552959fabe0a5d122  zabbix-3.0.1.tar.gz
 3a71e310bd2b38498a7c6830169f7480  zabbix-getloadavg.patch
 bf62c539870874e11de39c60cb974786  automake.patch
 40c81bdec85815f4ba637eb6528cc5e8  musl-fix-includes.patch
@@ -203,8 +197,8 @@ f44105322022734dc42032db0396fe9e  zabbix-server.initd
 bd91d0243cf8f72b86b9bf0b91963663  zabbix-server.confd
 d9711779f969958c8aa348991170578b  zabbix-agentd.initd
 0ce2ab963a0bc5a0a6e17a708b7c7064  zabbix-proxy.initd
-c3b399a406f7dd1df0de7b3fae3ed081  002-fix-res_send-on-uclibc.patch"
-sha256sums="0ebc6a3326e506cee18826baf2940e39fca3667650f7187e4aa103bf6f7f613c  zabbix-2.4.6.tar.gz
+3d031903ea14e1de0804ff1230fd968e  zabbix_server.conf.patch"
+sha256sums="e91a8497bf635b96340988e2d9ca1bb3fac06e657b6596fa903c417a6c6b110b  zabbix-3.0.1.tar.gz
 d2c0651c5fa67a1857707552e79ecece7ca95c149042460c40456634bf7611dc  zabbix-getloadavg.patch
 b347ca77660e69bea353c50e2fce0c7c4cc837f782c9f84f74ba92c1a62b4c1b  automake.patch
 38b4e1a5d5c16c7d9b31347acf710d84b693f6e1df365d1072548e897e034884  musl-fix-includes.patch
@@ -212,8 +206,8 @@ d4c6dcf9b78f78a2ef2b4a4f2763fb90f81d0298bc90bd164db8604f161182ec  zabbix-server.
 ddf75041fb0afc5b211dd79a934341cc9db4325447ad33a42cbf09bdfb5cad42  zabbix-server.confd
 62223dce45fb915cc66eb24c839cf63e81c80159da9360e7669e7384082e3a08  zabbix-agentd.initd
 ec3a8c564be20221ea7560fbec345191cd251d58bd15e9c41abec40c2cf5b4f2  zabbix-proxy.initd
-c796e9aa371f50155b396da53504375f35f77bd3941440525dcaf92da33dac99  002-fix-res_send-on-uclibc.patch"
-sha512sums="5bd2280799ec0ff6ffcae9dd6de65427a3691f47d7a53bb50842cf9732805fab42ce91e338c3ff3a15913fdd48a528e7352d974f41ec6723b19d6b1485604b1a  zabbix-2.4.6.tar.gz
+f87b221d32b3088db78c013f11d035339d7058817092dfdcc39898b4b3ee8448  zabbix_server.conf.patch"
+sha512sums="ee24883e37335bfe274a20fe43bd8ff1d1814e240177d7486363691374f8a07ef12506724ea9422efb11eaa8b2f49f2639dec774db160ffa00cb08a60a3fac78  zabbix-3.0.1.tar.gz
 b65c6ba7701d98ae7f6fe2124c1d2b8b8fea3c3cc7ee080bf99f5afff0aaa6a025c2a1f5136b4700b53d1b7609e6185642650d7edd013c554b2af37fddae771c  zabbix-getloadavg.patch
 9bff8966cb8b3f1767bfb1b3f3529bca5c9957f2c8179a40ded3b4e43615ba9fb408aef43092fd119b7df80b042555d05c9780fac3760176b95524aa48252fee  automake.patch
 9b87ec1ea4a9cbb501c16012d498cdae82a696f4cd495e1e8cb201d9e31c6e135da5bb264c6273f2de87297bd3e4bd16f66703610686f5d610e3316ee24aac91  musl-fix-includes.patch
@@ -221,4 +215,4 @@ b65c6ba7701d98ae7f6fe2124c1d2b8b8fea3c3cc7ee080bf99f5afff0aaa6a025c2a1f5136b4700
 a91821c6086a1fc0197750cc68073419defcb7d775b11b14a993409a8f61c7a1a0a0af95de27eed9f3b8357f8362640cb1b26b91b56f4f1d714ca6f222d02b80  zabbix-server.confd
 7cc2672b717f1b47b12342fe225e9dc3838c61a0bf81d359d0a71efb0adc9b354fb8bc8b5bb64c9defa5700bcaf651b35778194a50b6b03b0a723dce76460092  zabbix-agentd.initd
 e19490e724c6e4ecdadf7ee3898567b82f18ea2a894ef709bfc181c3076d50435b45429207dd4d537aacbec0242d83393240e48b434d9681ebb0d67a45643ed1  zabbix-proxy.initd
-cc00603b26a4bd49fba5d8b5e2aaaa7c947c888f4970a4a582a201012aee956f926251eb85236014660fe0b3fa1a22a7ac27b4331e00af64d2a658e972d2d7df  002-fix-res_send-on-uclibc.patch"
+e0c9f937d39e15fa34e70e8ae9e6578b221b51c13dc0515e807675d153a85ab6370ed20ce2d06aa4457baaf3963edce525cd00e85fb105b36b58741798d13836  zabbix_server.conf.patch"

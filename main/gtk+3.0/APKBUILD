@@ -1,6 +1,6 @@
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=gtk+3.0
-pkgver=3.18.3
+pkgver=3.18.8
 pkgrel=0
 pkgdesc="The GTK+ Toolkit (v3)"
 url="http://www.gtk.org/"
@@ -80,6 +80,6 @@ package() {
 	rm "$pkgdir"/usr/bin/gtk-update-icon-cache
 }
 
-md5sums="e172049e8c40ad03c4ac864b9a2e9bf4  gtk+-3.18.3.tar.xz"
-sha256sums="f3c76791f93f51e260b03676f83007730b9875a0a9bf5cd42442e2f14e593546  gtk+-3.18.3.tar.xz"
-sha512sums="2e79074fb932f05d4b345f75e70a0101d3a360ff2ec3ecff3d16f9a031b4627ffb757f749cf8e385072166c9c118d8d6b7602a38b7ad36e48bc920a226ff0c1b  gtk+-3.18.3.tar.xz"
+md5sums="9671acb41dc13561d19233f1a75cf184  gtk+-3.18.8.tar.xz"
+sha256sums="1c53ef1bb55364698f7183ecd185b547f92f4a3a7abfafd531400232e2e052f8  gtk+-3.18.8.tar.xz"
+sha512sums="b5181b5b78d642ce0c356fa5727a36d08dc503ffeb51d24d69b258e9150e4b4305e90c410c67672a7644079299559544c0e6d2c4a60171f55b7391945cb6a7ef  gtk+-3.18.8.tar.xz"

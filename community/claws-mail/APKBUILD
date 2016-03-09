@@ -1,7 +1,8 @@
+# Contributor: Łukasz Jendrysik
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=claws-mail
-pkgver=3.13.0
-pkgrel=0
+pkgver=3.13.2
+pkgrel=1
 pkgdesc="A GTK+ based e-mail client."
 url="http://www.claws-mail.org"
 arch="all"
@@ -13,7 +14,6 @@ subpackages="$pkgname-dbg $pkgname-dev $pkgname-doc $pkgname-lang
 	$pkgname-plugins-att-remove:_att_remover
 	$pkgname-plugins-attatchwarner:_attatchwarner
 	$pkgname-plugins-clamd:_clamd
-	$pkgname-plugins-fancy:_fancy
 	$pkgname-plugins-fetchinfo:_fetchinfo
 	$pkgname-plugins-mailmbox:_mailmbox
 	$pkgname-plugins-notification:_notification
@@ -33,12 +33,11 @@ makedepends="gtk+-dev openssl-dev startup-notification-dev enchant-dev
 	libgcrypt-dev libsm-dev gnutls-dev curl-dev dbus-glib-dev
 	libetpan-dev openldap-dev gpgme-dev libsoup-dev perl-dev
 	poppler-dev python-dev py-gtk-dev libarchive-dev libnotify-dev
-	pinentry-gtk spamassassin webkitgtk-dev
+	pinentry-gtk spamassassin
 	"
 depends="aspell-en"
 install=
-source="http://www.claws-mail.org/download.php?file=releases/claws-mail-$pkgver.tar.xz
-	"
+source="http://www.claws-mail.org/download.php?file=releases/claws-mail-$pkgver.tar.gz"
 
 _builddir="$srcdir"/$pkgname-$pkgver
 prepare() {
@@ -65,7 +64,6 @@ build() {
 		--enable-spamassassin-plugin \
 		--disable-bogofilter-plugin \
 		--enable-compface \
-		--enable-fancy \
 		--enable-pdf_viewer-plugin \
 		--disable-jpilot \
 		--disable-bsfilter-plugin \
@@ -124,10 +122,6 @@ _clamd() {
 	_plugin "Use Clam AntiVirus to scan messages in Claws Mail" "" clamd
 }
 
-_fancy() {
-	_plugin "Display HTML emails in Claws Mail" "" \
-		fancy
-}
 _fetchinfo() {
 	_plugin "Modify headers of downloaded messages in Claws Mail" "" \
 		fetchinfo
@@ -186,6 +180,6 @@ _vcalendar () {
 }
 
 
-md5sums="09f29aab91adea3e50131df56408958b  claws-mail-3.13.0.tar.xz"
-sha256sums="365076806c63dd8a1d6f08ead6a863a01ba05819c1a860ea7bbee8fcda4bf93a  claws-mail-3.13.0.tar.xz"
-sha512sums="5682a5e4642870a69374dc304d446db9dfd427bf8bd6f924a1193366098e07ca63623caefa454d62b413b8bb614fc7f1c0853852a1c44908c8541e554f3439e2  claws-mail-3.13.0.tar.xz"
+md5sums="cf3e36993f0d60c8777997a1ca570776  claws-mail-3.13.2.tar.gz"
+sha256sums="12ba486f68f0fe6e90be9418e272dd59d0dc41da710af5082c024d7723ec7847  claws-mail-3.13.2.tar.gz"
+sha512sums="ec24f7ca64be7f5256e346a328bd467e1b288762c4f914a0595a6d5c881f4054491d4d7d3ccecfc50098eca5382950f507f276b3304abec4c22fdf9b86c10794  claws-mail-3.13.2.tar.gz"

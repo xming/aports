@@ -1,17 +1,18 @@
+# Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
 # Contributor: Jeff Bilyk <jbilyk@gmail.com>
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=aria2
-pkgver=1.19.2
+pkgver=1.20.0
 pkgrel=0
 pkgdesc="Download utility for HTTP(S), (S)FTP, Bittorrent, and Metalink"
 url="http://aria2.sourceforge.net"
 arch="all"
 license="GPL2+"
 depends="ca-certificates"
-depends_dev="gnutls-dev expat-dev sqlite-dev c-ares-dev"
-makedepends="$depends_dev"
+depends_dev=""
+makedepends="gnutls-dev expat-dev sqlite-dev c-ares-dev"
 install=""
-subpackages="$pkgname-doc"
+subpackages="$pkgname-doc $pkgname-bash-completion:bashcomp"
 source="https://github.com/tatsuhiro-t/$pkgname/releases/download/release-$pkgver/$pkgname-$pkgver.tar.xz"
 
 _builddir="$srcdir"/$pkgname-$pkgver
@@ -46,6 +47,16 @@ package() {
 	make DESTDIR="$pkgdir" install || return 1
 }
 
-md5sums="b435162c17a886a0ef88d58d054ec21d  aria2-1.19.2.tar.xz"
-sha256sums="3605486dd495cd8c2f672b7d0b763397989d831396862f15730697ebcf0ad53e  aria2-1.19.2.tar.xz"
-sha512sums="ae3fb231fa9f989a8c4f8015d7e64db2b62b922548839a884454ef1fc6dc024363b482268200efa234ac71a1dba969aaefbeb81c811223e2e117f3adae9a8468  aria2-1.19.2.tar.xz"
+bashcomp() {
+	depends=""
+	pkgdesc="Bash completions for $pkgname"
+	install_if="$pkgname=$pkgver-r$pkgrel bash-completion"
+	arch="noarch"
+
+	install -Dm644 "$_builddir"/doc/bash_completion/aria2c \
+		"$subpkgdir"/usr/share/bash-completion/completions/_aria2c || return 1
+}
+
+md5sums="633b9f5c7a6d2a4198174cf895b4a038  aria2-1.20.0.tar.xz"
+sha256sums="bf96344b6fee3aada0881ca008b077ea2c5dd820e8f8d693329481ecc7ff8fd0  aria2-1.20.0.tar.xz"
+sha512sums="577fbf16567e6554e1b316ae83db35861cc37f98e3e79bb2f3c0bac03f39871e1712cb4cb6c52dd90f0e30b2d469bf8c774c7116223d7e68aef4c3d715439b9b  aria2-1.20.0.tar.xz"

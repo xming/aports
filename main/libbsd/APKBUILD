@@ -2,7 +2,7 @@
 # Contributor: William Pitcock <nenolod@dereferenced.org>
 # Maintainer: William Pitcock <nenolod@dereferenced.org>
 pkgname=libbsd
-pkgver=0.7.0
+pkgver=0.8.1
 pkgrel=0
 pkgdesc="commonly-used BSD functions not implemented by all libcs"
 url="http://libbsd.freedesktop.org/"
@@ -47,9 +47,9 @@ package() {
 	make DESTDIR="$pkgdir" install || return 1
 }
 
-md5sums="fcceb4e66fd448ca4ed42ba22a8babb0  libbsd-0.7.0.tar.xz
+md5sums="f3daff0283af6e30f25d68be2deac4ef  libbsd-0.8.1.tar.xz
 4449c9cd2447a595d283441c75256fbd  musl-fixes.patch"
-sha256sums="0f3b0e17e5c34c038126e0a04351b11e23c6101a7d0ce3beeab29bb6415c10bb  libbsd-0.7.0.tar.xz
+sha256sums="adbc8781ad720bce939b689f38a9f0247732a36792147a7c28027c393c2af9b0  libbsd-0.8.1.tar.xz
 94bc4853e2acae9d630f01aaae2992d166dd92154446112f1e80bb186c0e6be8  musl-fixes.patch"
-sha512sums="2c4c8fb2ae7fb5e5aab90f7a59a679220922dfeeaf0d54f80976914fcd507171bb9359f0837c32499e63a0f3e9342c9dcd387a466b359d20e3790ddc8ca17cea  libbsd-0.7.0.tar.xz
+sha512sums="8ae687cf6baf0364661d8452c0f2817ba9d7fc59fbf198aceda33d3b8575fd385e2915f145132b1a7fd43b18c0a7ba9306c98f0d98fc7e35412918df456364c6  libbsd-0.8.1.tar.xz
 a60b23c87dca30db2414f7f7184503cd080e2ff490f28d8b5a4c55ff48e282e80e636c0e72096753d4cf8b32f852004aa3b24eae7b6ef7e62ef85169f052335a  musl-fixes.patch"

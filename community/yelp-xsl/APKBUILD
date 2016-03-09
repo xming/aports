@@ -1,0 +1,41 @@
+# Contributor: Alan Lacerda <alacerda@alpinelinux.org>
+# Maintainer: Alan Lacerda <alacerda@alpinelinux.org>
+pkgname=yelp-xsl
+pkgver=3.18.1
+pkgrel=0
+pkgdesc="A collection of programs and data files to help you build,maintain, and distribute documentation."
+url="https://wiki.gnome.org/Apps/Yelp"
+arch="noarch"
+license="GPL/LGPL/MIT"
+depends=""
+depends_dev=""
+makedepends="intltool libxslt itstool"
+install=""
+subpackages=""
+source="http://ftp.gnome.org/pub/gnome/sources/$pkgname/${pkgver%.*}/$pkgname-$pkgver.tar.xz"
+
+_builddir="$srcdir/$pkgname-$pkgver"
+prepare() {
+	local i
+	cd "$_builddir"
+	for i in $source; do
+		case $i in
+		*.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
+		esac
+	done
+}
+
+build() {
+	cd "$_builddir"
+	./configure --prefix=/usr || return 1
+	make || return 1
+}
+
+package() {
+	cd "$_builddir"
+	make DESTDIR="${pkgdir}" install || return 1
+}
+
+md5sums="4c0750cd7a9bc6c302c1f362ddddd2f5  yelp-xsl-3.18.1.tar.xz"
+sha256sums="00870fbe59a1bc7797b385fce16386917e2987c404e9b5a7adcf0036f1c1ba62  yelp-xsl-3.18.1.tar.xz"
+sha512sums="3c4cb72f21f5b704fc67e6324489ea3f58d36318c899b920162a593c3757532d5cff6de01c8bf6c0994dc190c8a9b7abf4a3214504edcb3d0982ab0f0d69090a  yelp-xsl-3.18.1.tar.xz"

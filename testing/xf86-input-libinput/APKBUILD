@@ -1,0 +1,39 @@
+# Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
+# Maintainer:
+pkgname=xf86-input-libinput
+pkgver=0.17.0
+pkgrel=0
+pkgdesc="X.Org input driver based on libinput"
+url="http://xorg.freedesktop.org/"
+arch="all"
+license="custom"
+depends=""
+depends_dev="libinput-dev xorg-server-dev"
+makedepends="$depends_dev resourceproto scrnsaverproto"
+install=""
+subpackages="$pkgname-dev $pkgname-doc"
+source="http://xorg.freedesktop.org/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2"
+
+_builddir="$srcdir"/$pkgname-$pkgver
+build() {
+	cd "$_builddir"
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var \
+		|| return 1
+	make || return 1
+}
+
+package() {
+	cd "$_builddir"
+	make DESTDIR="$pkgdir" install || return 1
+	install -Dm644 COPYING "$pkgdir"/usr/share/licenses/$pkgname/COPYING
+}
+
+md5sums="513e849d92914aec7ba48459a61299e8  xf86-input-libinput-0.17.0.tar.bz2"
+sha256sums="2a378a25da46a875b6699ada29332290798e37df708ab2f2e4b0915ef1fbbab2  xf86-input-libinput-0.17.0.tar.bz2"
+sha512sums="738d4937f25dcb432bd664a204cbd4c66f38bd3385040ec56bc1949842d7099491d4ad96f2ba68342119046ed3d94ac562568f228c6a38686ba6cc86e9256f4d  xf86-input-libinput-0.17.0.tar.bz2"

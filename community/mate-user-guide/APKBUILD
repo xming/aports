@@ -1,0 +1,47 @@
+# Contributor: Alan Lacerda <alacerda@alpinelinux.org>
+# Maintainer: Alan Lacerda <alacerda@alpinelinux.org>
+pkgname=mate-user-guide
+pkgver=1.12.0
+pkgrel=0
+pkgdesc="Documents targeted for end-users of MATE"
+url="https://github.com/mate-desktop/mate-user-guide"
+arch="noarch"
+license="CC"
+depends=""
+depends_dev=""
+makedepends="$depends_dev itstool libxml2-utils intltool"
+install=""
+subpackages="$pkgname-doc"
+source="http://pub.mate-desktop.org/releases/${pkgver%.*}/$pkgname-$pkgver.tar.xz"
+
+_builddir="$srcdir/$pkgname-$pkgver"
+prepare() {
+	local i
+	cd "$_builddir"
+	for i in $source; do
+		case $i in
+		*.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
+		esac
+	done
+}
+
+build() {
+	cd "$_builddir"
+	./configure \
+                 --build=$CBUILD \
+                  --host=$CHOST \
+                  --sysconfdir=/etc \
+                  --with-gtk=2.0 \
+                  --prefix=/usr \
+                  || return 1
+        make || return 1
+}
+
+package() {
+	cd "$_builddir"
+	 make DESTDIR="${pkgdir}" install || return 1
+}
+
+md5sums="a530d4e10e7ea5a670467aa8f545b13b  mate-user-guide-1.12.0.tar.xz"
+sha256sums="1733b5429a38b1ca5bf5922f530f8149df80b9caf613d405fd98c05762bd4c29  mate-user-guide-1.12.0.tar.xz"
+sha512sums="b92a58e2104d22007bf61ca2dc71e02acd250886393a9b3ccb397a3172a1f0542a34589ea2c82f9b985af0ae3ce505012f69731d82d8412949f5ffc254356456  mate-user-guide-1.12.0.tar.xz"

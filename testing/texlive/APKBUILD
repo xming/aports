@@ -1,22 +1,28 @@
-# Contributor: Carlo Landmeter <clandmeter@gmail.com>
+# Contributor: Isaac Dunham <ibid.ag@gmail.com>
 # Maintainer:
 pkgname=texlive
 pkgver=20150521
-pkgrel=3
-pkgdesc="A complete TeX distribution"
+pkgrel=5
+pkgdesc="Comprehensive TeX document production system"
 url="http://tug.org/texlive/"
 arch="all"
 license="GPL"
-depends=""
-depends_dev="freetype-dev libpng-dev poppler-dev icu-dev harfbuzz-dev
-	cairo-dev pixman-dev zziplib-dev libpaper-dev graphite2-dev
-	libxmu-dev fontconfig-dev"
-makedepends="$depends_dev"
+depends="perl"
+depends_dev=""
+makedepends="freetype-dev libpng-dev poppler-dev icu-dev harfbuzz-dev
+         cairo-dev pixman-dev zziplib-dev libpaper-dev graphite2-dev
+         libxmu-dev fontconfig-dev libxaw-dev motif-dev"
 install=""
-subpackages="$pkgname-dev $pkgname-doc"
+subpackages="$pkgname-dev $pkgname-doc xdvik:xdvi $pkgname-xetex:xetex $pkgname-luatex:lua $pkgname-full:meta"
 source="ftp://ftp.tug.org/historic/systems/$pkgname/${pkgver%????}/$pkgname-$pkgver-source.tar.xz"
 
-_builddir="$srcdir"/texlive-$pkgver-source
+_LUATEX="dvilualatex dviluatex lualollipop"
+_PDFTEX="amstex cslatex csplain eplain etex jadetex latex lollipop mex
+	mllatex mltex pdfetex pdfcslatex pdfcsplain pdfjadetex pdflatex
+	pdfmex pdfxmltex texsis utf8mex xmltex"
+_XETEX="xelatex xelollipop"
+
+_builddir="$srcdir"/texlive-${pkgver}-source
 prepare() {
 	local i
 	cd "$_builddir"
@@ -69,7 +75,6 @@ build() {
 		--disable-tex4htk \
 		--disable-ttf2pk2 \
 		--disable-vlna \
-		--disable-xdvik \
 		--disable-xindy \
 		--with-ps=gs \
 		--with-banner-add="/Alpine Linux" \
@@ -78,7 +83,6 @@ build() {
 		--with-system-graphite2 \
 		--with-system-harfbuzz \
 		--with-system-icu \
-		--with-system-icu \
 		--with-system-libpaper \
 		--with-system-libpng \
 		--with-system-pixman \
@@ -86,6 +90,7 @@ build() {
 		--with-system-xpdf \
 		--with-system-zlib \
 		--with-system-zziplib \
+		--with-x-dvi-toolkit=motif \
 		--without-texinfo \
 		|| return 1
 	make || return 1
@@ -96,6 +101,80 @@ package() {
 	make DESTDIR="$pkgdir" install || return 1
 	cp -rf ../texk/tests/TeXLive \
 		"$pkgdir"/usr/share/texmf-dist/scripts/texlive || return 1
+	for TEXCMD in $_PDFTEX;	do
+		ln -s pdftex "$pkgdir"/usr/bin/$TEXCMD || return 1
+	done
+	ln -s eptex "$pkgdir"/usr/bin/platex && \
+	ln -s euptex "$pkgdir"/usr/bin/uplatex || return 1
+	sed -i -e 's:SELFAUTOPARENT:TEXMFROOT:' \
+	  "$pkgdir"/usr/share/texmf-dist/scripts/texlive/tlmgr.pl || return 1
+	sed -i -e 's:^\(TEXMFROOT *= *\)$SELFAUTOPARENT$:\1/usr/share:g' \
+	  "$pkgdir"/usr/share/texmf-dist/web2c/texmf.cnf || return 1
+}
+
+xetex() {
+	# Split off XeTeX because it depends on graphite/harfbuzz/icu
+	pkgdesc="TeX typesetting engine supporting modern typography and bidirectional text"
+	depends="$pkgname"
+	mkdir -p "$subpkgdir" || return 1
+	install -d -m 0755 "$subpkgdir"/usr/bin || return 1
+	mv "$pkgdir"/usr/bin/xetex "$subpkgdir"/usr/bin/ || return 1
+	for TEXCMD in $_XETEX; do
+		ln -s xetex "$subpkgdir"/usr/bin/$TEXCMD || return 1
+	done
+}
+
+meta() {
+	pkgdesc="A complete TeX distribution"
+	depends="$pkgname $pkgname-doc $pkgname-luatex $pkgname-xetex xdvik"
+	mkdir -p "$subpkgdir" || return 1
+}
+
+lua() {
+	pkgdesc="LuaTeX is an extended version of pdfTeX, scriptable in Lua"
+	depends="bash $pkgname" # lua2dox_filter is a bash script
+	mkdir -p "$subpkgdir" || return 1
+	cd "$subpkgdir" || return 1
+	install -d -m 0755 usr/bin usr/lib \
+		usr/share/texmf-dist/scripts/context/stubs/unix || return 1
+	mv "$pkgdir"/usr/bin/*lua* "$subpkgdir"/usr/bin/ && \
+	mv "$pkgdir"/usr/lib/lib*lua*.so.* "$subpkgdir"/usr/lib/ || return 1
+	mv "$pkgdir"/usr/share/texmf-dist/scripts/*lua* \
+		"$subpkgdir"/usr/share/texmf-dist/scripts/ || return 1
+	mv "$pkgdir"/usr/share/texmf-dist/scripts/context/stubs/unix/luatools \
+	"$subpkgdir"/usr/share/texmf-dist/scripts/context/stubs/unix/luatools \
+		|| return 1
+	for TEXCMD in $_LUATEX
+		do ln -s luatex "$subpkgdir"/usr/bin/$TEXCMD || return 1
+		done
+	cd -
+#	The following directories are used strictly for Lua scripts:
+#	for DIR in
+#		usr/share/texmf-dist/scripts/checkcites/ \
+#		usr/share/texmf-dist/scripts/getmap/ \
+#		usr/share/texmf-dist/scripts/m-tx/ \
+#		usr/share/texmf-dist/scripts/musixtex/ \
+#		usr/share/texmf-dist/scripts/pmx/ \
+#		usr/share/texmf-dist/scripts/pmxchords/ \
+#		usr/share/texmf-dist/scripts/ptex2pdf/ ;
+#	do
+#		mv "$pkgdir"/"$DIR" "$subpkgdir"/usr/share/texmf-dist/scripts/
+#	done
+}
+
+xdvi() {
+	# currently, xdvi needs a number of files and scripts from texlive;
+	# we split it off so that it doesn't drag in X and Motif.
+	depends="texlive"
+	pkgdesc="Xdvi from texlive, using the texlive libraries"
+	provides="xdvi"
+	mkdir -p "$subpkgdir" || return 1
+	cd "$subpkgdir" && \
+	install -d -m 0755 usr/bin usr/share/texmf-dist/ && \
+	mv "$pkgdir"/usr/bin/xdvi "$pkgdir"/usr/bin/xdvi-* usr/bin/ && \
+	mv "$pkgdir"/usr/share/texmf-dist/xdvi usr/share/texmf-dist/ \
+	|| return 1
+	cd -
 }
 
 md5sums="e526bd57118c4c4d5e9d525d20b5ac02  texlive-20150521-source.tar.xz"

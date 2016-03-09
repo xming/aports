@@ -1,16 +1,18 @@
 # Contributor: William Pitcock <nenolod@dereferenced.org>
+# Contributor: Jose-Luis Rivas <ghostbar@riseup.net>
 # Maintainer: Eivind Uggedal <eivind@uggedal.com>
 pkgname=nodejs
-pkgver=4.2.1
-pkgrel=0
+pkgver=4.3.1
+pkgrel=1
 pkgdesc='Evented I/O for V8 javascript'
 url='http://nodejs.org/'
 arch='all'
 license='MIT'
+# gold is needed for mksnapshot
 makedepends="$depends_dev python openssl-dev zlib-dev libuv-dev
-	linux-headers paxmark"
+	linux-headers paxmark binutils-gold"
 subpackages="$pkgname-dev $pkgname-doc"
-source="http://nodejs.org/dist/v$pkgver/node-v$pkgver.tar.gz"
+source="https://nodejs.org/dist/v$pkgver/node-v$pkgver.tar.gz"
 _builddir="$srcdir"/node-v$pkgver
 
 prepare() {
@@ -25,13 +27,15 @@ prepare() {
 
 build() {
         cd "$_builddir"
-	[ "$CARCH" = "armhf" ] && local _FPU="--with-arm-fpu=vfpv3-d16"
 	./configure --prefix=/usr \
 		--shared-zlib \
 		--shared-libuv \
-		$_FPU \
-		--shared-openssl || return 1
-	make || return 1
+		--shared-openssl \
+		|| return 1
+	# we need run mksnapshot at build time so paxmark it early
+	make -C out mksnapshot BUILDTYPE=Release \
+		&& paxmark -m out/Release/mksnapshot \
+		&& make || return 1
 }
 
 package() {
@@ -46,7 +50,6 @@ package() {
 		rm -r "$pkgdir"/usr/lib/node_modules/npm/$d || return 1
 	done
 }
-
-md5sums="41d2b9fb5220af3fd98dd70fb33a2a10  node-v4.2.1.tar.gz"
-sha256sums="8861b9f4c3b4db380fcda19a710c0430c3d62d03ee176c64db63eef95a672663  node-v4.2.1.tar.gz"
-sha512sums="c7c71e2c838697ac5a6dc425d0b0706c25a26f2cbc188dc62f072fbc255b5ba4186b03438139348c35285e8557cc022abf7d19f9037cbfaa0b68135b70c61ca9  node-v4.2.1.tar.gz"
+md5sums="d4eaaa7c139f13fc0168d9b5fbe13a0b  node-v4.3.1.tar.gz"
+sha256sums="61e2d58e861b6c9dbf0ac7624b718198cbd59b88a9de31a39a05de95a32eee73  node-v4.3.1.tar.gz"
+sha512sums="156bee1237038a6d6029f96dba41e8673f8c2cce234b86a4197eb700b52e64bc8315f40fc9f321392ea21155216f944642dc7a35b2104a5c1836087f5ebb7b8e  node-v4.3.1.tar.gz"

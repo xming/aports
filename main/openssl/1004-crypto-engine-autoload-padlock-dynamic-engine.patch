@@ -1,17 +1,17 @@
-From a358a1267644829144d6ad35116733ceeef46bf1 Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Timo=20Ter=C3=A4s?= <timo.teras@iki.fi>
-Date: Thu, 5 Feb 2015 09:43:37 +0200
+From a58658f191e83f4c6417d2cc879fa572f7978537 Mon Sep 17 00:00:00 2001
+From: Natanael Copa <ncopa@alpinelinux.org>
+Date: Thu, 4 Feb 2016 16:28:15 +0100
 Subject: [PATCH] crypto/engine: autoload padlock dynamic engine
 
 ---
- crypto/engine/eng_all.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ crypto/engine/eng_all.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/crypto/engine/eng_all.c b/crypto/engine/eng_all.c
-index 195a3a9..bd05e4c 100644
+index 48ad0d2..822aa23 100644
 --- a/crypto/engine/eng_all.c
 +++ b/crypto/engine/eng_all.c
-@@ -120,6 +120,15 @@ void ENGINE_load_builtin_engines(void)
+@@ -120,6 +120,16 @@ void ENGINE_load_builtin_engines(void)
      ENGINE_load_capi();
  # endif
  #endif
@@ -21,6 +21,7 @@ index 195a3a9..bd05e4c 100644
 +        if (e != NULL) {
 +            ENGINE_add(e);
 +            ENGINE_free(e);
++            ERR_clear_error();
 +        }
 +    }
 +#endif
@@ -28,5 +29,5 @@ index 195a3a9..bd05e4c 100644
  }
  
 -- 
-2.2.2
+2.7.0
 

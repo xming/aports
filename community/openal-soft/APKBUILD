@@ -1,7 +1,7 @@
 # Contributor: William Pitcock <nenolod@dereferenced.org>
-# Maintainer:
+# Maintainer: Francesco Colista <fcolista@alpinelinux.org>
 pkgname=openal-soft
-pkgver=1.16.0
+pkgver=1.17.1
 pkgrel=0
 pkgdesc="software implementation of OpenAL API"
 url="http://kcat.strangesoft.net/openal.html"
@@ -40,6 +40,6 @@ package() {
 	make DESTDIR="$pkgdir" install || return 1
 }
 
-md5sums="14db4b0d12f07252070b4fe5eb5911f6  openal-soft-1.16.0.tar.bz2"
-sha256sums="2f3dcd313fe26391284fbf8596863723f99c65d6c6846dccb48e79cadaf40d5f  openal-soft-1.16.0.tar.bz2"
-sha512sums="b89e46902ce475afd47c4c153ae666646e8b277abf1be97f92b6a10dc585ed780c663591398a9fd7e4118595dd45d2d8d6df0101b4148686150bbb3fe2939ddc  openal-soft-1.16.0.tar.bz2"
+md5sums="4e1cff46cdb3ac147745dea33ad92687  openal-soft-1.17.1.tar.bz2"
+sha256sums="087153baab375c23d7aa7e9f3237c0a1d02e336537b485aee56d9ac312baf6f8  openal-soft-1.17.1.tar.bz2"
+sha512sums="f0b14e9fdcc22bb18d9c3278392fd94959cd3d85d83ad0472dcac24122fe1f8c818ef8c47197424f6d9789524d0aff64965ce502965f5d6541a772fc8dc3286d  openal-soft-1.17.1.tar.bz2"

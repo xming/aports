@@ -1,0 +1,41 @@
+# Contributor: Alan Lacerda <alacerda@alpinelinux.org>
+# Maintainer: Alan Lacerda <alacerda@alpinelinux.org>
+pkgname=engrampa
+pkgver=1.12.0
+pkgrel=0
+pkgdesc="An archive manager for the MATE"
+url="http://mate-desktop.org/"
+arch="all"
+license="GPLv2"
+depends="libxml2-utils"
+depends_dev=""
+makedepends="$depends_dev glib-dev gtk+2.0-dev caja-dev itstool libsm-dev"
+install=""
+subpackages="$pkgname-doc $pkgname-lang"
+source="http://pub.mate-desktop.org/releases/${pkgver%.*}/$pkgname-$pkgver.tar.xz"
+
+_builddir="$srcdir/$pkgname-$pkgver"
+prepare() {
+	local i
+	cd "$_builddir"
+	for i in $source; do
+		case $i in
+		*.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
+		esac
+	done
+}
+
+build() {
+	cd "$_builddir"
+	./configure --prefix=/usr || return 1
+	make || return 1
+}
+
+package() {
+	cd "$_builddir"
+	make DESTDIR="${pkgdir}" install || return 1
+}
+
+md5sums="2312750eb9abcbc35bf1d04ba83d2a76  engrampa-1.12.0.tar.xz"
+sha256sums="4f1f8b0829000f6bb2d8a53a8da098dc5b177638c6d8e5b3fb52402a4541759c  engrampa-1.12.0.tar.xz"
+sha512sums="8c694b1f1baab099316f6e5d5ec67ae95171df3a988aee11b0527ae797717e7b3e57fa1ec53cb78e9aa397b1758f768736231ad1bd91c1bb8b2ba2f8f755cfec  engrampa-1.12.0.tar.xz"
