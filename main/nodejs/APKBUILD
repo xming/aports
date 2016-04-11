@@ -2,8 +2,8 @@
 # Contributor: Jose-Luis Rivas <ghostbar@riseup.net>
 # Maintainer: Eivind Uggedal <eivind@uggedal.com>
 pkgname=nodejs
-pkgver=4.4.0
-pkgrel=1
+pkgver=4.4.2
+pkgrel=0
 pkgdesc='Evented I/O for V8 javascript'
 url='http://nodejs.org/'
 arch='all'
@@ -50,6 +50,6 @@ package() {
 		rm -r "$pkgdir"/usr/lib/node_modules/npm/$d || return 1
 	done
 }
-md5sums="4783dd4443e5a3a3421785f8a5cf5ea4  node-v4.4.0.tar.gz"
-sha256sums="2cfc76292576d17a8f2434329221675972c96e5fd60cd694610f53134079f92e  node-v4.4.0.tar.gz"
-sha512sums="e18c895cf3170546bc326bb0b1a1f219cfa212e6cdc6c240477f6cef625c98bf0fe4d5de7817a7345e7cd63096572b8841902209da81b75afebd94313fec1a66  node-v4.4.0.tar.gz"
+md5sums="a0f91fa97aa837658c1eaf9a9b80c873  node-v4.4.2.tar.gz"
+sha256sums="ae91cb0a31f87b5b13bb2665178845d99abf1037dc3636fa88f442b4a4c65297  node-v4.4.2.tar.gz"
+sha512sums="87f97f009bb5d12a7c6d67101311d5c6c6f73a5a5f64b14352c6a07ed4ec08059890eaf8e08ee59909bfdf6b8c0f31d86201d5ea81df0e828c4f88b33b06fc6c  node-v4.4.2.tar.gz"
