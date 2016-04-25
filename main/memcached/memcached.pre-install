@@ -1,5 +1,5 @@
 #!/bin/sh
 
-adduser -H -s /sbin/nologin -D memcached 2>/dev/null
-exit 0
+adduser -S -D -H -s /sbin/nologin -g memcached memcached 2>/dev/null
 
+exit 0

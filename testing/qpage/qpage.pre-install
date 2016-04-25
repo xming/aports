@@ -1,3 +1,5 @@
 #!/bin/sh
 
-adduser -h /var/lib/qpage -s /bin/false -G qpage -D qpage 2>/dev/null || true
+adduser -S -D -h /var/lib/qpage -s /bin/false -G qpage -g qpage qpage 2>/dev/null
+
+exit 0

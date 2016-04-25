@@ -1,3 +1,5 @@
 #!/bin/sh
 
-getent group kvm >/dev/null || addgroup -g 34 -S kvm
+addgroup -S -g 34 kvm 2>/dev/null
+
+exit 0

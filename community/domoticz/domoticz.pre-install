@@ -1,0 +1,5 @@
+#!/bin/sh
+
+adduser -S -D -h /var/lib/domoticz -s /sbin/nologin -g domoticz domoticz 2>/dev/null
+
+exit 0

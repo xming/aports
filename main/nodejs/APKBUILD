@@ -1,8 +1,6 @@
-# Contributor: William Pitcock <nenolod@dereferenced.org>
-# Contributor: Jose-Luis Rivas <ghostbar@riseup.net>
-# Maintainer: Eivind Uggedal <eivind@uggedal.com>
+# Maintainer: Jose-Luis Rivas <ghostbar@riseup.net>
 pkgname=nodejs
-pkgver=4.4.2
+pkgver=5.10.1
 pkgrel=0
 pkgdesc='Evented I/O for V8 javascript'
 url='http://nodejs.org/'
@@ -12,6 +10,7 @@ license='MIT'
 makedepends="$depends_dev python openssl-dev zlib-dev libuv-dev
 	linux-headers paxmark binutils-gold"
 subpackages="$pkgname-dev $pkgname-doc"
+replaces="nodejs-lts"
 source="https://nodejs.org/dist/v$pkgver/node-v$pkgver.tar.gz"
 _builddir="$srcdir"/node-v$pkgver
 
@@ -50,6 +49,6 @@ package() {
 		rm -r "$pkgdir"/usr/lib/node_modules/npm/$d || return 1
 	done
 }
-md5sums="a0f91fa97aa837658c1eaf9a9b80c873  node-v4.4.2.tar.gz"
-sha256sums="ae91cb0a31f87b5b13bb2665178845d99abf1037dc3636fa88f442b4a4c65297  node-v4.4.2.tar.gz"
-sha512sums="87f97f009bb5d12a7c6d67101311d5c6c6f73a5a5f64b14352c6a07ed4ec08059890eaf8e08ee59909bfdf6b8c0f31d86201d5ea81df0e828c4f88b33b06fc6c  node-v4.4.2.tar.gz"
+md5sums="1378c65a30b5ebcd3a2fc7384477379e  node-v5.10.1.tar.gz"
+sha256sums="c6e278b612b53c240ddf85521403e55abfd8f0201d2f2c7e3d2c21383054aacd  node-v5.10.1.tar.gz"
+sha512sums="e8b38e70a4cd8eb5c63556932eab8eb252b8c2c81c9bfd9223a168beafb221ae0791e3cb0520b87355f035635bdede1c5759cee57757605a821551e992d2415a  node-v5.10.1.tar.gz"

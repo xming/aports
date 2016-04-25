@@ -1,5 +1,5 @@
 #!/bin/sh
 
-adduser -h /var/lib/ez-ipupdate -s /sbin/nologin -D ipupdate 2>/dev/null
-exit 0
+adduser -S -D -h /var/lib/ez-ipupdate -s /sbin/nologin -g ipupdate ipupdate 2>/dev/null
 
+exit 0
