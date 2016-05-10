@@ -1,45 +1,45 @@
-# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+# Maintainer: Jakub Jirutka <jakub@jirutka.cz>
 _gemname=bundler
 pkgname=ruby-$_gemname
-pkgver=1.10.5
+pkgver=1.12.1
 pkgrel=0
 pkgdesc="Manage an application's gem dependencies"
 url="http://gembundler.com/"
 arch="noarch"
 license="MIT"
-depends="ruby"
-depends_dev=
-makedepends="$depends_dev"
-install=""
-subpackages=""
+depends="ruby ruby-io-console"
+makedepends=""
 source="http://gems.rubyforge.org/gems/$_gemname-$pkgver.gem"
+builddir="$srcdir"/$_gemname-$pkgver
 
-_builddir="$srcdir"/$_realname-$pkgver
 build() {
 	return 0
 }
 
 package() {
-	local _gemdir="$(ruby -rubygems -e'puts Gem.default_dir')"
-	local _geminstdir=$_gemdir/gems/$_gemname-$pkgver
-	mkdir -p "$pkgdir" || return 1
+	local gemdir="$pkgdir/$(ruby -rubygems -e 'puts Gem.default_dir')"
 
-	gem install --local --install-dir "$pkgdir"/$_gemdir \
-		--ignore-dependencies --verbose --no-rdoc --no-ri \
+	mkdir -p "$pkgdir"/usr/bin || return 1
+
+	gem install --local \
+		--install-dir "$gemdir" \
+		--ignore-dependencies \
+		--no-document \
+		--verbose \
 		"$srcdir"/$_gemname-$pkgver.gem || return 1
-	rm -rf "$pkgdir"/$_gemdir/cache \
-		"$pkgdir"/$_geminstdir/ext \
-		"$pkgdir"/$_geminstdir/.require_paths
-	
+
+	rm -rf "$gemdir"/cache \
+		"$gemdir"/build_info \
+		"$gemdir"/doc
+
 	cd "$pkgdir"
-	for i in usr/lib/ruby/gems/*/bin/*; do
-		if [ -e "$i" ]; then
-			mkdir -p "$pkgdir"/usr/bin
-			ln -s /$i "$pkgdir"/usr/bin/
+	local path; for path in usr/lib/ruby/gems/*/bin/*; do
+		if [ -f "$path" ]; then
+			ln -s /$path "$pkgdir"/usr/bin/ || return 1
 		fi
 	done
 }
 
-md5sums="685dedd2bd253231be12d3a7f45b1c65  bundler-1.10.5.gem"
-sha256sums="cc166e24197d772d85a0788d1b2e2a12c0c5748e54c898abd275ad948ce17dfe  bundler-1.10.5.gem"
-sha512sums="d347bdb701aa6bc60a26725f7fdfd05f03162610dfb2f648e755a3687795184ccfe5758617a1951365800ea13e1f1018c75bcdf0a4f116223806270676638021  bundler-1.10.5.gem"
+md5sums="cde53351a0db44d8f90d2ea8bd8e836d  bundler-1.12.1.gem"
+sha256sums="e3133b1a73d51d7adb9898e24ef07d84e479fb121b8f848320756db222ceaed0  bundler-1.12.1.gem"
+sha512sums="a7ffa7ec6a541f404a8b343ab5fc4d69a47d9f702764a3d85eb0e27656283c5e7c90500cfd9ada9805152a0286e91d463d94bc4ec52ad1420409770e6784f1bf  bundler-1.12.1.gem"

@@ -1,8 +1,8 @@
 # Contributor: Leonardo Arena <rnalrd@alpinelinux.org>
 # Maintainer:
 pkgname=milter-greylist
-pkgver=4.4.3
-pkgrel=5
+pkgver=4.5.16
+pkgrel=3
 pkgdesc="Stand-alone milter written in C that implements the greylist filtering method"
 url="http://hcpnet.free.fr/milter-greylist"
 arch="all"
@@ -27,6 +27,7 @@ prepare() {
                 *.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
                 esac
         done
+	#autoreconf -vif
 }
 
 build() {
@@ -43,8 +44,10 @@ build() {
 		--with-user=smmsp \
 		--with-conffile=/etc/$pkgname/greylist.conf \
 		--with-dumpfile=/var/lib/$pkgname/greylist.db \
+		--with-thread-safe-resolver \
 		--enable-postfix \
 		--enable-spamassassin \
+		--enable-dnsrbl \
 		--disable-rpath
 	make -j1 || return 1
 }
@@ -53,13 +56,14 @@ package() {
 	cd "$builddir"
 	make DESTDIR="$pkgdir" install || return 1
 	install -m755 -D ../../$pkgname.initd "$pkgdir"/etc/init.d/$pkgname || return 1
-	install -m644 greylist2.conf "$pkgdir"/etc/$pkgname/greylist2.conf
+	install -m644 -D greylist2.conf "$pkgdir"/etc/$pkgname/greylist2.conf
+	mkdir -p "$pkgdir"/var/lib/$pkgname
 	chown -R smmsp:smmsp "$pkgdir"/var/lib/$pkgname
 }
 
-md5sums="19cf27dc8077a01d103fcf2f367e9509  milter-greylist-4.4.3.tgz
-bbecf43a626a81f3383e7b9d21042290  milter-greylist-conf.patch"
-sha256sums="fdf7e37c5dd370473ff2cdec7e4b6ca9e60fc2b5c716612d2d449de98d0054a9  milter-greylist-4.4.3.tgz
-c0abf2a935f58f7aa8e2f49c272a9fd7c99b6464c2ff00706d1c475b5917db1a  milter-greylist-conf.patch"
-sha512sums="789c2b1d5b330b4564ef454aaebe891250c655f712081a436bb2d7462daa3590e02b6829881cb2e315db1238e021480013be95d0457d6bbde79a4230926cc841  milter-greylist-4.4.3.tgz
-e48bab52eb6fe8a8123ddc56753fb0fa5243bd07272cf2440269cd348f96f6f6a33163e49d9b009a5ff6181a212f9d5d25354d7ddd787603bcde84eda29e4d9c  milter-greylist-conf.patch"
+md5sums="dead8ceb27b0b471025bedabd742ce14  milter-greylist-4.5.16.tgz
+141e3b79fcea533cdd9ae57f2d731f24  milter-greylist-conf.patch"
+sha256sums="a820616fc6052a74c646bf55b1f44c5931fc87758df8cdbd5b61af6032cc6eb1  milter-greylist-4.5.16.tgz
+973788cd06c96d7e9c02d9ccfc1dd62f85c3ef635b44873755575033b7a97336  milter-greylist-conf.patch"
+sha512sums="0627ac09f74fd9fde7d990afd055f12e9f82c1e1edfc38aaa03b56328c6eeaf091c3e80258d75929fa114a33ee5a418baf0c8ad9f6c76be77aeba1942f0d6cbc  milter-greylist-4.5.16.tgz
+4057061fae24a8d008c6a8aed82018a4bb9f6e9ce72a13d9369d54b192e9a6e99b0e72db8905aa182879c9522b87a92844d0be92773843773508a21e42dbd447  milter-greylist-conf.patch"

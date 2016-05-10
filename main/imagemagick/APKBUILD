@@ -1,7 +1,8 @@
+# Contributor: Łukasz Jendrysik <scadu@yandex.com>
 # Contributor: Carlo Landmeter <clandmeter@gmail.com>
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=imagemagick
-pkgver=6.9.3.8
+pkgver=6.9.4.0
 _abiver=6
 _pkgver=${pkgver%.*}-${pkgver##*.}
 pkgrel=0
@@ -14,7 +15,7 @@ options="libtool"
 makedepends="zlib-dev libpng-dev libjpeg-turbo-dev freetype-dev fontconfig-dev
 	perl-dev ghostscript-dev libwebp-dev libtool tiff-dev lcms2-dev"
 subpackages="$pkgname-doc $pkgname-dev $pkgname-c++:_cxx"
-source="ftp://ftp.imagemagick.org/pub/ImageMagick/ImageMagick-$_pkgver.tar.xz"
+source="http://www.imagemagick.org/download/releases/ImageMagick-$_pkgver.tar.xz"
 
 _builddir="$srcdir/ImageMagick-${_pkgver}"
 prepare() {
@@ -72,6 +73,6 @@ _cxx() {
 	mv "$pkgdir"/usr/lib/libMagick++*.so.* "$subpkgdir"/usr/lib/
 }
 
-md5sums="5dcd975b0f6f70cc1f0f26a882a99ba7  ImageMagick-6.9.3-8.tar.xz"
-sha256sums="90ac96f51fa62caf8e24d3e169e6ba5f0059b04101e53eb27e70317339233a89  ImageMagick-6.9.3-8.tar.xz"
-sha512sums="3517cc1282619aa97c1afea8e584920954720925b176802964933dbf25ba13e340b41c2b64090ce72c9651162e763cd1e0c5c8bbd4abd2193cc7e6a9644a8b80  ImageMagick-6.9.3-8.tar.xz"
+md5sums="a6a4933c651b04d4a2b3f787c0c2b5e9  ImageMagick-6.9.4-0.tar.xz"
+sha256sums="7d2a20ac185f9ac9b6f5a7fbb6320bd04ce04ffd63e06ae608625592aa444306  ImageMagick-6.9.4-0.tar.xz"
+sha512sums="74ad8d2f7df5cf7519892d4b5d7959e5b3f3d1ff80e498537dbe0ec7495bf0f5c739291b8ba5e34033b14dda78dd28100af9ec264709b3ac44e763ec0002027b  ImageMagick-6.9.4-0.tar.xz"
