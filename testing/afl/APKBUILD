@@ -1,0 +1,38 @@
+# Contributor: Marian <mari.hahn@wwu.de>
+# Maintainer: Marian <mari.hahn@wwu.de>
+pkgname=afl
+pkgver=2.18b
+pkgrel=0
+pkgdesc="american fuzzy lop is a fuzzer relying on genetic algorithms instead brute force"
+url="http://lcamtuf.coredump.cx/afl/"
+arch="all"
+license="apache_2_0"
+depends="clang clang-libs llvm llvm-libs"
+depends_dev=""
+makedepends="llvm-dev clang-dev"
+install=""
+subpackages="$pkgname-doc"
+source="http://lcamtuf.coredump.cx/afl/releases/$pkgname-$pkgver.tgz"
+
+_builddir="${srcdir}/${pkgname}-${pkgver}"
+
+build() {
+	# using the llvm mode, which is faster and portable
+	cd "$_builddir"
+	make CC=clang BINDIR=/usr/bin AFL_NO_X86=1
+	make CC=clang BINDIR=/usr/bin AFL_NO_X86=1 -C llvm_mode
+}
+
+package() {
+	cd "$_builddir"
+	make AFL_NO_X86=1 BINDIR=/usr/bin PREFIX=/usr DESTDIR="$pkgdir" install
+	
+	# Removing non llvm_mode compiler wrappers, which are slower and only
+	# working on x86
+	rm "${pkgdir}/usr/bin/afl-clang" "${pkgdir}/usr/bin/afl-clang++" \
+	   "${pkgdir}/usr/bin/afl-gcc" "${pkgdir}/usr/bin/afl-g++"
+}
+
+md5sums="bec910d0df3fb7067defc7a1b81b353e  afl-2.18b.tgz"
+sha256sums="cffcdcd9f02f81634b82c2b34a174c1c2552fbc9be92245d8fb87c78b37d06a4  afl-2.18b.tgz"
+sha512sums="ea0198a25d3cd4e4f2b0f32cb9c894aab0c23b7d48c41acbccf7ec74ae1166f6658c1306d05ff11edff7c691a68f4e652d9c53b9a64b30464647ac4f0b4f543d  afl-2.18b.tgz"

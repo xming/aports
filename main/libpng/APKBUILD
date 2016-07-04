@@ -1,7 +1,7 @@
 # Contributor: Carlo Landmeter <clandmeter@gmail.com>
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=libpng
-pkgver=1.6.21
+pkgver=1.6.23
 _apngver=$pkgver
 pkgrel=0
 pkgdesc="Portable Network Graphics library"
@@ -16,7 +16,7 @@ source="http://downloads.sourceforge.net/$pkgname/$pkgname-$pkgver.tar.gz
 	http://downloads.sourceforge.net/sourceforge/libpng-apng/libpng-$_apngver-apng.patch.gz
 	"
 
-_builddir="$srcdir/$pkgname-$pkgver"
+_builddir="$srcdir"/$pkgname-$pkgver
 prepare() {
 	cd "$_builddir"
 	gunzip -c "$srcdir"/libpng-$pkgver-apng.patch.gz | patch -p1 || return 1
@@ -28,19 +28,23 @@ build() {
 		--build=$CBUILD \
 		--host=$CHOST \
 		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var \
 		|| return 1
-	make
+	make || return 1
 }
 
 package() {
-	cd "$srcdir/$pkgname-$pkgver"
-	make DESTDIR="$pkgdir" install
-	install -Dm644 LICENSE "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE || return 1
+	cd "$_builddir"
+	make DESTDIR="$pkgdir" install || return 1
+	install -Dm644 LICENSE \
+		"$pkgdir"/usr/share/licenses/$pkgname/LICENSE || return 1
 }
 
-md5sums="aca36ec8e0a3b406a5912243bc243717  libpng-1.6.21.tar.gz
-360346394543ec0a880f61830541608f  libpng-1.6.21-apng.patch.gz"
-sha256sums="b36a3c124622c8e1647f360424371394284f4c6c4b384593e478666c59ff42d3  libpng-1.6.21.tar.gz
-6da70e2526fe91c3379592546d2f14c0dfef8f04e2b338dddd5dc9ef45618c73  libpng-1.6.21-apng.patch.gz"
-sha512sums="033bbac08e5415500289dc41a854f1a2b1b61923b62bcdccb6f5d9c0f1efb95924712f2b5ec370bfbea30ec3deab5883a308ee78709a81095c748359a63373ae  libpng-1.6.21.tar.gz
-144bf07770d5584ea78648b65468a9acd40909b34c501ec4d91fc53ddf8ca85c99e2fcb1b245fce54d045b60ad2e1da575c27ad6ca566358643b4573176f05b2  libpng-1.6.21-apng.patch.gz"
+md5sums="a49e4cc48d968c79def53d082809c9f2  libpng-1.6.23.tar.gz
+bf44929a1c272f585a11baeca05af500  libpng-1.6.23-apng.patch.gz"
+sha256sums="74a9db9ddd66caa64be82bfcb3cbec4fc4394ceb1053cb7e94b2a0aa9b78eb88  libpng-1.6.23.tar.gz
+08906e0639a953f6be2d47857661cbdf04dcab93d3bf9f8cb0f7675567b07ad3  libpng-1.6.23-apng.patch.gz"
+sha512sums="f5cf137186fc0a10deb3ce54b1961cb9a358cec380cd3f8c21d2726e68348574c49a5a6808ecd79736737e970fa41ae83626811cb72b059bbf6054fabf6639f8  libpng-1.6.23.tar.gz
+105e7f70d1292f4a059e62fda7c4ffbfcd4eacd3c11cd1fbdd09bdcf2b1469a54ee864c4f5f22afe9e17ddfd1d10196661a69bb4eb469173a3bfc789181923ce  libpng-1.6.23-apng.patch.gz"

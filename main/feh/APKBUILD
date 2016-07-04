@@ -1,6 +1,6 @@
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=feh
-pkgver=2.15.2
+pkgver=2.16
 pkgrel=0
 pkgdesc="feh is a fast, lightweight image viewer which uses imlib2"
 url="http://www.linuxbrit.co.uk/feh/"
@@ -24,6 +24,6 @@ package() {
 	make DESTDIR=$pkgdir docsdir=/usr/share/doc/feh install || return 1
 	install -D -m644 COPYING "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
 }
-md5sums="56af710d9aea7d6ed0a7589f5d64cfc1  feh-2.15.2.tar.bz2"
-sha256sums="38c89b5d3109ca06d8917da334726d2b9e1a34f79e5091449ebf50e14199ce2e  feh-2.15.2.tar.bz2"
-sha512sums="5e4838432699bc75f5c5a2388b3dcbe39edaa5b3eccb98c4f52a6ab04a651a133f81ae2f6b27f645e37fb8426ba8dba653d4e2b2c53ebebc5e00020e99bb7308  feh-2.15.2.tar.bz2"
+md5sums="c190e7df67bfb79a6c71a00ce6205df0  feh-2.16.tar.bz2"
+sha256sums="a2639dec600ffac3ac3d3ffb4254bef7385082b9c417bef72167b7b258778e4c  feh-2.16.tar.bz2"
+sha512sums="f429b54d91d0c955c1105ee8e1f4e3030a4afd7e0b06311e33c76e662859d55028e6e2a6785ca6676efd12d927a6eb8fdc77d5885bdf721453d4ac112e278d70  feh-2.16.tar.bz2"

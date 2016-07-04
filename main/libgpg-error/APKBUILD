@@ -1,7 +1,7 @@
 # Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=libgpg-error
-pkgver=1.21
+pkgver=1.23
 pkgrel=0
 pkgdesc="Support library for libgcrypt"
 url="http://www.gnupg.org"
@@ -15,8 +15,9 @@ subpackages="$pkgname-dev $pkgname-doc $pkgname-lisp"
 source="ftp://ftp.franken.de/pub/crypt/mirror/ftp.gnupg.org/gcrypt/$pkgname/$pkgname-$pkgver.tar.bz2
 	"
 
+builddir="$srcdir"/$pkgname-$pkgver
 build () {
-	cd "$srcdir"/$pkgname-$pkgver
+	cd "$builddir"
 	./configure \
 		--build=$CBUILD \
 		--host=$CHOST \
@@ -30,7 +31,7 @@ build () {
 }
 
 package() {
-	cd "$srcdir"/$pkgname-$pkgver
+	cd "$builddir"
 	make -j1 DESTDIR="$pkgdir" install || return 1
 }
 
@@ -39,6 +40,6 @@ lisp() {
 	mv "$pkgdir"/usr/share "$subpkgdir"/usr/share/
 }
 
-md5sums="ab0b5aba6d0a185b41d07bda804fd8b2  libgpg-error-1.21.tar.bz2"
-sha256sums="b7dbdb3cad63a740e9f0c632a1da32d4afdb694ec86c8625c98ea0691713b84d  libgpg-error-1.21.tar.bz2"
-sha512sums="1bc2e27b9904cb66b091c4d15855d2d2fe5d88ed11917df628cd7865989a8a208b607e5d6c499a5d64a16d22b2310b7df6868fa5462cc30cd8fda80a2f8c8315  libgpg-error-1.21.tar.bz2"
+md5sums="5bc2d7ec28f91f883fb6f23d5c784ca7  libgpg-error-1.23.tar.bz2"
+sha256sums="7f0c7f65b98c4048f649bfeebfa4d4c1559707492962504592b985634c939eaa  libgpg-error-1.23.tar.bz2"
+sha512sums="2fc9989f35ead8f73a6bd041717d03904d7f247ba5ca2c470c249ba7bde6c347d5f18410eb8df4b4d90e9b02d7d60c8713063a39d7ad87083d5e9d098894d4ee  libgpg-error-1.23.tar.bz2"

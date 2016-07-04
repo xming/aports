@@ -3,7 +3,7 @@
 # Maintainer: Francesco Colista <fcolista@alpinelinux.org>
 pkgname=perl-mailtools
 _pkgreal=MailTools
-pkgver=2.16
+pkgver=2.18
 pkgrel=0
 pkgdesc="Various e-mail related modules"
 url="http://search.cpan.org/dist/MailTools/"
@@ -36,6 +36,6 @@ package() {
 	find "$pkgdir" \( -name perllocal.pod -o -name .packlist \) -delete
 }
 
-md5sums="8ee459fafedb9d222c40598fe374dcb7  MailTools-2.16.tar.gz"
-sha256sums="56a56ed11e9dc44995dd70159c3a67fdaf1c78488cfb1a7045d32e81b8b23814  MailTools-2.16.tar.gz"
-sha512sums="996c13da572ca04f0e3238ab6d977f9ef4efd46e652652022a56d595ec23dabc451c2003eb5359d0b4a80b1b37666452e3a0ca10542e95465614d41348d4c7ba  MailTools-2.16.tar.gz"
+md5sums="972468ab5207b90398d77bed4ffc361d  MailTools-2.18.tar.gz"
+sha256sums="dfee9e770257371112f20d978e637759e81bc4f19e97b083585c71ecab37b527  MailTools-2.18.tar.gz"
+sha512sums="2bd3f16bedf38c067f5fb7e719d0750ff96a8893e60abbc50568e0bc135a0acb4a8f6a18474e6884ab5b916d4959dbe4ba6a5b271e446bd68073b91dbc1ca7c2  MailTools-2.18.tar.gz"
