@@ -2,7 +2,7 @@
 # Contributor: Andrew Manison<amanison@anselsystems.com>
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=mutt
-pkgver=1.6.1
+pkgver=1.7.0
 pkgrel=0
 pkgdesc="a small but very powerful text-mode email client"
 url="http://www.mutt.org"
@@ -61,6 +61,6 @@ package() {
 		"$pkgdir"/etc/Muttrc.gpg.dist || return 1
 }
 
-md5sums="be4d6e738c75c9287e76db7caec6bace  mutt-1.6.1.tar.gz"
-sha256sums="98b26cecc6b1713082fc880344fa345c20bd7ded6459abe18c84429c7cf8ed20  mutt-1.6.1.tar.gz"
-sha512sums="a45c7bc681ea31a6ee37e95a11f3ec84f580478367250c80eaf5aceeba87e34411346a8b7e80a0f236c507cec1199ddc3ccf4596b81d7e31c235099dccdd4fd5  mutt-1.6.1.tar.gz"
+md5sums="2897069ce71e52bf9549e9317fcb9ffa  mutt-1.7.0.tar.gz"
+sha256sums="1d3e987433d8c92ef88a604f4dcefdb35a86ce73f3eff0157e2e491e5b55b345  mutt-1.7.0.tar.gz"
+sha512sums="60ff00f268285c12b48e39ca0b5a8bd7e09323255874a6211edc94218ed191ad24ad437dd9c180c45ea6d5a9f163d04bb5515ddf3488c92f4e9411588c550612  mutt-1.7.0.tar.gz"

@@ -1,6 +1,6 @@
 # Maintainer: Jose-Luis Rivas <ghostbar@riseup.net>
 pkgname=nodejs
-pkgver=6.2.2
+pkgver=6.3.1
 pkgrel=0
 pkgdesc='Evented I/O for V8 javascript'
 url='http://nodejs.org/'
@@ -49,6 +49,6 @@ package() {
 		rm -r "$pkgdir"/usr/lib/node_modules/npm/$d || return 1
 	done
 }
-md5sums="1120e8bf191fdaee42206d031935210d  node-v6.2.2.tar.gz"
-sha256sums="b6baee57a0ede496c7c7765001f7495ad74c8dfe8c34f1a6fb2cd5d8d526ffce  node-v6.2.2.tar.gz"
-sha512sums="65c5579aef66884609a18f87608736379af4522075807f6d7fb74487b01fdfd30b697c237fe50f15bb883ca8b376fdacab2e216963c5f0c90a47427a116ba5cd  node-v6.2.2.tar.gz"
+md5sums="6a08fbe8788ea4c798ada16e274d8d98  node-v6.3.1.tar.gz"
+sha256sums="3f6144dcf13c210b11c83dc0b0a841219347a769b5a3b883b20f7ab8dc4008f6  node-v6.3.1.tar.gz"
+sha512sums="7b0670312361b88ba7997919276fe98bd0cd6a690efbcdfc903dfcc1dbd241406395dcfe67cebdd107ed9309c3fd4d2f3460caa6505dc84a7c1e418ad6de9c50  node-v6.3.1.tar.gz"

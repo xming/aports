@@ -3,13 +3,13 @@
 pkgname=java-jna
 _pkgname=${pkgname#java-}
 pkgver=4.2.2
-pkgrel=1
+pkgrel=2
 pkgdesc="JNA provides Java programs easy access to native shared libraries."
 url="https://github.com/java-native-access/jna"
 arch="x86 x86_64"
 license="ASL-2.0 LGPL-2.1"
 depends="openjdk8-jre-base"
-makedepends="apache-ant autoconf automake build-base libffi-dev>=3.2 libtool openjdk8"
+makedepends="apache-ant autoconf automake libffi-dev>=3.2 libtool openjdk8"
 subpackages="$pkgname-native"
 source="$pkgname-$pkgver.tar.gz::https://github.com/java-native-access/$_pkgname/archive/$pkgver.tar.gz
 	0001-jar-without-natives.patch
@@ -17,6 +17,8 @@ source="$pkgname-$pkgver.tar.gz::https://github.com/java-native-access/$_pkgname
 builddir="$srcdir/$_pkgname-$pkgver"
 
 prepare() {
+	default_prepare || return 1
+
 	cd "$builddir"
 
 	# Disable Java AWT support (requires some X libs).
@@ -26,8 +28,6 @@ prepare() {
 	rm -r native/libffi || return 1
 
 	find -name "*.jar" -exec rm {} + || return 1
-
-	default_prepare  # apply patches
 }
 
 build() {
@@ -42,7 +42,8 @@ build() {
 }
 
 package() {
-	depends="$pkgname"
+	arch="noarch"
+	depends="$depends $pkgname-native"
 
 	install -m644 -D "$builddir"/build/jna.jar \
 		"$pkgdir"/usr/share/java/$_pkgname-$pkgver.jar || return 1
@@ -50,7 +51,6 @@ package() {
 }
 
 native() {
-	arch="all"
 	local soname="libjnidispatch.so"
 
 	cd "$builddir"

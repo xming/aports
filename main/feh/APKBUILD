@@ -1,9 +1,9 @@
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=feh
-pkgver=2.16
+pkgver=2.16.2
 pkgrel=0
 pkgdesc="feh is a fast, lightweight image viewer which uses imlib2"
-url="http://www.linuxbrit.co.uk/feh/"
+url="http://feh.finalrewind.org/"
 arch="all"
 license="MIT"
 subpackages="$pkgname-doc"
@@ -15,15 +15,19 @@ source="https://feh.finalrewind.org/${pkgname}-${pkgver}.tar.bz2"
 _builddir="$srcdir"/$pkgname-$pkgver
 build() {
 	cd "$_builddir"
-	sed -i -e "s:/usr/local:/usr:g" config.mk
-	make || return 1
+	make PREFIX=/usr || return 1
 }
 
 package() {
 	cd "$_builddir"
-	make DESTDIR=$pkgdir docsdir=/usr/share/doc/feh install || return 1
-	install -D -m644 COPYING "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+	make PREFIX=/usr DESTDIR="$pkgdir" \
+		bin_dir="$pkgdir"/usr/bin \
+		man_dir="$pkgdir"/usr/share/man \
+		doc_dir="$pkgdir"/usr/share/doc/$pkgname \
+		example_dir="$pkgdir"/usr/share/doc/$pkgname/examples \
+		install || return 1
 }
-md5sums="c190e7df67bfb79a6c71a00ce6205df0  feh-2.16.tar.bz2"
-sha256sums="a2639dec600ffac3ac3d3ffb4254bef7385082b9c417bef72167b7b258778e4c  feh-2.16.tar.bz2"
-sha512sums="f429b54d91d0c955c1105ee8e1f4e3030a4afd7e0b06311e33c76e662859d55028e6e2a6785ca6676efd12d927a6eb8fdc77d5885bdf721453d4ac112e278d70  feh-2.16.tar.bz2"
+
+md5sums="20695ee5c9581e22fef528b9d66511a6  feh-2.16.2.tar.bz2"
+sha256sums="aa37124ae010e7dac7d101d5c66f3d49da79e96c7ce21d77bfe3c9322ed2e7ca  feh-2.16.2.tar.bz2"
+sha512sums="e288a0a5abe12c6e124b351a4d723845f8d7041fc87be15fb95266d00e35b319bf7a57073383157d4634f00bc974264d0622fac8166c97348a8bc1d563c16807  feh-2.16.2.tar.bz2"

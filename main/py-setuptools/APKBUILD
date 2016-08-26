@@ -2,8 +2,8 @@
 # Maintainer:  Fabian Affolter <fabian@affolter-engineering.ch>
 pkgname=py-setuptools
 _pkgname=${pkgname#py-}
-pkgver=20.8.0
-pkgrel=0
+pkgver=24.0.3
+pkgrel=3
 pkgdesc="A collection of enhancements to the Python distutils"
 url="http://pypi.python.org/pypi/setuptools"
 arch="noarch"
@@ -12,12 +12,14 @@ depends="python"
 makedepends="python-dev"
 install=""
 subpackages=""
-source="http://pypi.python.org/packages/source/${_pkgname:0:1}/$_pkgname/$_pkgname-$pkgver.tar.gz"
+source="${_pkgname}-${pkgver}.tar.gz::https://github.com/pypa/${_pkgname}/archive/v${pkgver}.tar.gz
+	"
 
 builddir="$srcdir"/$_pkgname-$pkgver
 
 build() {
 	cd "$builddir"
+	python bootstrap.py || return 1
 	python setup.py build || return 1
 }
 
@@ -29,6 +31,6 @@ package() {
 	rm -f "$pkgdir"/usr/bin/easy_install || return 1
 }
 
-md5sums="a728fb0f3e14d26f50022290ae2d6cc7  setuptools-20.8.0.tar.gz"
-sha256sums="4ff6eb20d6eaf23f358b0b885abf1cd7d01cd62827a5ed0e49f39451a0a42745  setuptools-20.8.0.tar.gz"
-sha512sums="b5569e15edbcea21ee065c316fb184f9cbaa9daa1053c9eae3293e0e10ef53cf228c17d48ec057dc1c5c9a05c8d64148b8d576e4815fdb1f3aacc10938d8a2a2  setuptools-20.8.0.tar.gz"
+md5sums="11472d17f777b83757681d0608ae9aee  setuptools-24.0.3.tar.gz"
+sha256sums="b342d2d457a678d558e51aaab79640360d350b0044816259b3085e079adcbdcf  setuptools-24.0.3.tar.gz"
+sha512sums="f664e1feb417e2eb0f8658ee0f2cb3b308b3e11d5dde6b67cefc7549b0693be268343fd508e654ea0b8080658373d260e537b54ec18499c35e078fd6b79de952  setuptools-24.0.3.tar.gz"

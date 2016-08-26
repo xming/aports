@@ -2,7 +2,7 @@
 
 _flavor=vanilla
 pkgname=linux-${_flavor}
-pkgver=4.4.14
+pkgver=4.4.19
 case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
@@ -17,9 +17,12 @@ _config=${config:-config-vanilla.${CARCH}}
 install=
 source="http://ftp.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/linux-$_kernver.tar.xz
 
+	config-vanilla.aarch64
 	config-vanilla.armhf
 	config-vanilla.x86
 	config-vanilla.x86_64
+
+	0001-Add-dts-for-GIGABYTE-X-Gene-MP30-AR0.patch
 	"
 if [ "${pkgver%.0}" = "$pkgver" ]; then
 	source="$source
@@ -30,6 +33,14 @@ arch="all"
 license="GPL2"
 
 _abi_release=${pkgver}
+_carch=${CARCH}
+case "$_carch" in
+aarch64*) _carch="arm64" ;;
+arm*) _carch="arm" ;;
+esac
+
+HOSTCC="${CC:-gcc}"
+HOSTCC="${HOSTCC#${CROSS_COMPILE}}"
 
 prepare() {
 	local _patch_failed=
@@ -60,21 +71,21 @@ prepare() {
 
 	mkdir -p "$srcdir"/build
 	cp "$srcdir"/$_config "$srcdir"/build/.config || return 1
-	make -C "$srcdir"/linux-$_kernver O="$srcdir"/build HOSTCC="${CC:-gcc}" \
+	make -C "$srcdir"/linux-$_kernver O="$srcdir"/build ARCH="$_carch" HOSTCC="$HOSTCC" \
 		silentoldconfig
 }
 
 # this is so we can do: 'abuild menuconfig' to reconfigure kernel
 menuconfig() {
 	cd "$srcdir"/build || return 1
-	make menuconfig
+	make ARCH="$_carch" menuconfig
 	cp .config "$startdir"/$_config
 }
 
 build() {
 	cd "$srcdir"/build
-	export GCC_SPECS=hardenednopie.specs
-	make CC="${CC:-gcc}" \
+	make ARCH="$_carch" CC="${CC:-gcc}" \
+		KCFLAGS="-fno-pie" \
 		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Alpine" \
 		|| return 1
 }
@@ -86,23 +97,16 @@ package() {
 
 	local _install
 	case "$CARCH" in
-	arm*)
-		local _dtbdir="$pkgdir"/usr/lib/linux-${_abi_release}
-		mkdir -p "$_dtbdir"
-		for i in arch/arm/boot/dts/*.dtb ; do
-			install -m644 "$i" "$_dtbdir"
-		done
-
-		_install=zinstall
-		;;
-	*)
-		_install=install
-		;;
+	aarch64*|arm*)	_install="zinstall dtbs_install" ;;
+	*)		_install="install" ;;
 	esac
 
 	make -j1 modules_install firmware_install $_install \
+		ARCH="$_carch" \
+		KCFLAGS="-fno-pie" \
 		INSTALL_MOD_PATH="$pkgdir" \
 		INSTALL_PATH="$pkgdir"/boot \
+		INSTALL_DTBS_PATH="$pkgdir"/usr/lib/linux-${_abi_release} \
 		|| return 1
 
 	rm -f "$pkgdir"/lib/modules/${_abi_release}/build \
@@ -122,14 +126,14 @@ dev() {
 	# build a tiny kernel module
 	#
 	pkgdesc="Headers and script for third party modules for grsec kernel"
-	depends="gmp-dev"
+	depends="gmp-dev bash"
 	local dir="$subpkgdir"/usr/src/linux-headers-${_abi_release}
 
 	# first we import config, run prepare to set up for building
 	# external modules, and create the scripts
 	mkdir -p "$dir"
 	cp "$srcdir"/$_config "$dir"/.config
-	make -j1 -C "$srcdir"/linux-$_kernver O="$dir" HOSTCC="${CC:-gcc}" \
+	make -j1 -C "$srcdir"/linux-$_kernver O="$dir" ARCH="$_carch" HOSTCC="$HOSTCC" \
 		silentoldconfig prepare modules_prepare scripts 
 
 	# remove the stuff that poits to real sources. we want 3rd party
@@ -161,17 +165,23 @@ dev() {
 }
 
 md5sums="9a78fa2eb6c68ca5a40ed5af08142599  linux-4.4.tar.xz
-1b986f138b3bd1e920515ced30578268  config-vanilla.armhf
-ac3bb5cf3fa7a53e99c8d30718173a88  config-vanilla.x86
-b6a03e4cd34f4f8ad83ba680d62e14ed  config-vanilla.x86_64
-24bdcde8502d841d58f1e45fc2de217f  patch-4.4.14.xz"
+a6dfa9d305a9625396f09d6ec35eede8  config-vanilla.aarch64
+6f923d5029129429bceae658a832ff4c  config-vanilla.armhf
+60c2b6b5d9c671470fff8266555ad3d8  config-vanilla.x86
+1b7e060937dd969d42480e48b516b721  config-vanilla.x86_64
+e10e580b7aadf42ba595e35d3ff3fc69  0001-Add-dts-for-GIGABYTE-X-Gene-MP30-AR0.patch
+8cd0a643e0233960a72145731a8b6bdd  patch-4.4.19.xz"
 sha256sums="401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2  linux-4.4.tar.xz
-044c2eac9428c94ef784fc70a232ce0b88c10e70b4612d4d6061bee223884b2e  config-vanilla.armhf
-727f0e58aae0dba6db1c29c11ecf52a744cba62cd10f484eea1d4060ec435e57  config-vanilla.x86
-a164e108412b08ec0a946c8b86849b4060dce6c846adfe17591adb9cbcb4ea83  config-vanilla.x86_64
-63b67f25867d6f0c9e8721d0d4c39c902622d0351055808ada340909ed566509  patch-4.4.14.xz"
+dea3531c6aac5419789d8d5c9f018faf65e7b87ae0c11726b8827edd381bbac6  config-vanilla.aarch64
+6a923534767f24e0adc515e4c29ee7b95498be4fc0c9ba61142669bacd8d7cb0  config-vanilla.armhf
+e7df86b65f7064eca60b8ac5a21260161a4eae8a48b6dfe7f057751f119c492a  config-vanilla.x86
+70d4f132f8fd55df918b7f6a1348b9901644117c48acb4cff6731e461ef538a9  config-vanilla.x86_64
+b9bcbe11c017764075179fb61fb13f6d0eca2c5495402d8f4ace2331cfe0c0b4  0001-Add-dts-for-GIGABYTE-X-Gene-MP30-AR0.patch
+61b34a8ab4ba778c50a6fb04471cb34192e179db68440d81b12694e45dea00fc  patch-4.4.19.xz"
 sha512sums="13c8459933a8b80608e226a1398e3d1848352ace84bcfb7e6a4a33cb230bbe1ab719d4b58e067283df91ce5311be6d2d595fc8c19e2ae6ecc652499415614b3e  linux-4.4.tar.xz
-cb748b5129e1f60ff9734223c1f88b213d15ba405cbea4d2dc737acdc76efbdf9f102ea08f68c6343db19522ef22df52fe61b9c353f41339790c751897393e70  config-vanilla.armhf
-a04b3447e5ebfa3f545edc3df517c1974349241c6adcc1eecb70159498dadebd87d49bb8c8af1727560589029b68c5bb830f82ed02380be66f6fa14b464da58c  config-vanilla.x86
-3a70d264edfbaca6155212997110a45ff64928a71c1c93b580eaaa08612b6861a475c7736e6dc65c7a10370971ce751997c96de41750a2db6ed4829fd564d7d5  config-vanilla.x86_64
-ee029b1b5df9787ce87ae7d1c25fa9782ce6be0bf27ae638f57e020f5035dbbd00b6d24bf7ce9601ded47f20684a6bb20900e8802cdd631033bf7a22b71b2dba  patch-4.4.14.xz"
+e54a65b033615e31922e00605b7e393a92cde51984ebd4dffd5fbf5dad697ce9b79e8c2983ea23f307b3fd57ca6e56f18ae5c7377d780039b03dab3e9bc82671  config-vanilla.aarch64
+b31f3708f177f4841e89e7eb01a4e93bd977c79f3255522c01c1664d36fd680dfaf31fb407d6e00b0a4dcee31f8e7daba5119b51377a3a6056f37aefb9067da2  config-vanilla.armhf
+84f1779ab4ee7bbdcddca2c713947af0768d2b29e53f607c728b7c2f7de64bf5d9b5e1556e0d2a8479ff7a15a8532e38fd949098fd478bcbf571707d0aef5c3c  config-vanilla.x86
+cacc61470c25934fff51dcdf2f6188aeb833eb881399d6b7f97548e399095c3279704655dc090ce3a56c089e8b0fb101e1469500f79b4fd28b4335658435b901  config-vanilla.x86_64
+ebc1b89ff0985246889f68c32fb0bd326eb0f015a97b913bf8e2b92855c75809d114c57aff8f3f74d120694f1c5891d7a11ebe4aadaadd1954a947e762bf121d  0001-Add-dts-for-GIGABYTE-X-Gene-MP30-AR0.patch
+77b0bb79563a918a92506c26e14bda26860aa64e9c0247f75b51c945a6c7b45a965ae54baa443e03f7d2075bdae31fad6bd51fb740d85fbc6498b7bc8f9b2772  patch-4.4.19.xz"

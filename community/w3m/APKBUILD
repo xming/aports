@@ -1,11 +1,14 @@
+# Contributor: ScrumpyJack <scrumpyjack@st.ilet.to>
+# Maintainer: ScrumpyJack <scrumpyjack@st.ilet.to>
 pkgname=w3m
 pkgver=0.5.3
-pkgrel=0
+pkgrel=1
 pkgdesc='Text-based Web browser, as well as pager'
 url='http://w3m.sourceforge.net/'
 license='MIT UCD'
 arch='all'
 makedepends="imlib2-dev openssl-dev gc-dev ncurses-dev linux-headers"
+subpackages="$pkgname-doc"
 source="http://downloads.sourceforge.net/project/${pkgname}/${pkgname}/${pkgname}-${pkgver}/${pkgname}-${pkgver}.tar.gz
 	form_unknown.patch
 	file_handle.patch
@@ -13,19 +16,15 @@ source="http://downloads.sourceforge.net/project/${pkgname}/${pkgname}/${pkgname
 	gc72.patch
 	w3m-0.5.3-parallel-make.patch
 	"
+builddir="${srcdir}/${pkgname}-${pkgver}"
 
 prepare() {
-	local i
-	cd "${srcdir}/${pkgname}-${pkgver}"
-	for i in $source; do
-		case $i in
-		*.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
-		esac
-	done
+	default_prepare || return 1
+	update_config_guess || return 1
 }
 
 build() {
-	cd "${srcdir}/${pkgname}-${pkgver}"
+	cd $builddir
 	./configure \
 		--prefix=/usr \
 		--libexecdir=/usr/lib \
@@ -44,7 +43,7 @@ build() {
 }
 
 package() {
-	cd "${srcdir}/${pkgname}-${pkgver}"
+	cd $builddir
 	make DESTDIR="${pkgdir}" install
 
 	install -d "${pkgdir}"/usr/share/doc/"${pkgname}"
