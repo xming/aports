@@ -1,0 +1,49 @@
+# Contributor: Fabian Affolter <fabian@affolter-engineering.ch>
+# Maintainer: Fabian Affolter <fabian@affolter-engineering.ch>
+pkgname=py-click
+_pkgname=click
+pkgver=6.6
+pkgrel=0
+pkgdesc="A simple wrapper around optparse for powerful command line utilities"
+url="http://click.pocoo.org/"
+arch="noarch"
+license="BSD"
+depends=""
+makedepends="python2-dev python3-dev py-setuptools"
+subpackages="py2-${pkgname#py-}:_py2 py3-${pkgname#py-}:_py3"
+source="https://files.pythonhosted.org/packages/source/${_pkgname:0:1}/$_pkgname/$_pkgname-$pkgver.tar.gz"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+build() {
+	cd "$builddir"
+
+	python2 setup.py build || return 1
+	python3 setup.py build
+}
+
+package() {
+	mkdir -p "$pkgdir"
+}
+
+_py2() {
+	replaces="$pkgname"
+	_py python2
+}
+
+_py3() {
+	_py python3
+}
+
+_py() {
+	local python="$1"
+	pkgdesc="$pkgdesc (for $python)"
+	depends="$depends $python"
+	install_if="$pkgname=$pkgver-r$pkgrel $python"
+
+	cd "$builddir"
+	$python setup.py install --prefix=/usr --root="$subpkgdir"
+}
+
+md5sums="d0b09582123605220ad6977175f3e51d  click-6.6.tar.gz"
+sha256sums="cc6a19da8ebff6e7074f731447ef7e112bd23adf3de5c597cf9989f2fd8defe9  click-6.6.tar.gz"
+sha512sums="5650cfe6c8b55a7e823e22248964143278d61383dac63497508a864807f1950f9dd5d76ce6a501e589dd81fed6e2a1248d3f8973be25a91950896b7408dc88bc  click-6.6.tar.gz"

@@ -1,0 +1,29 @@
+# Contributor: Francesco Colista <fcolista@alpinelinux.org>
+# Maintainer: Francesco Colista <fcolista@alpinelinux.org>
+pkgname=biblatex
+pkgver=3.6
+pkgrel=0
+pkgdesc="Sophisticated Bibliographies in LaTeX"
+url="https://www.ctan.org/pkg/biblatex"
+arch="noarch"
+license="LPPL1.3"
+depends="texlive-luatex"
+makedepends="bash perl"
+subpackages=""
+source="$pkgname-$pkgver.tar.gz::https://github.com/plk/biblatex/archive/v$pkgver.tar.gz"
+builddir="$srcdir/$pkgname-$pkgver"
+
+build() {
+	cd "$builddir"
+	return 0
+}
+
+package() {
+	cd "$builddir"
+	mkdir -p "$pkgdir"/usr/share/texmf-dist
+	obuild/build.sh install $pkgver "$pkgdir"/usr/share/texmf-dist/
+}
+
+md5sums="7b041a404251ca9dbd60230b56d2822d  biblatex-3.6.tar.gz"
+sha256sums="c460149a34be1fb7fd9e024a3964f8ed3967d81744121aebdc20b29e9fa1ec91  biblatex-3.6.tar.gz"
+sha512sums="991fe125472511164b9eb3c4ddcd99f5068642d9ebba8a2ffd6474581f1dd0d8fa7c01e1a789106ebddcac4dcb54642b20ccdfd92ab03448604a03461649860d  biblatex-3.6.tar.gz"

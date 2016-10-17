@@ -1,10 +1,10 @@
 #!/sbin/openrc-run
 
 # This file is part of PSAD (Port Scan Attack Detector)
-# Adapted for Alpine Linux by IT Offshore <developer@it-offshore.co.uk>
+# Adapted for Alpine Linux by Stuart Cardall <developer@it-offshore.co.uk>
 
 command="/usr/sbin/psad"
-pidfile="/var/run/psad/psad.pid"
+pidfile="/run/psad/psad.pid"
 config_file="/etc/psad/psad.conf"
 
 depend() {
@@ -22,14 +22,14 @@ check_config() {
 
 start_pre() {
 	check_config || return 1
-	# make sure dir for pidfile exists. /var/run is tmpfs...
+	# make sure dir for pidfile exists. /run is tmpfs...
 	checkpath --directory ${pidfile%/*}
 }
 
 start() {
-    ebegin "Starting PSAD (Port Scan Attack Detector)"
-    start-stop-daemon --start $command --pidfile $pidfile
-    eend $?
+	ebegin "Starting PSAD (Port Scan Attack Detector)"
+	start-stop-daemon --start $command --pidfile $pidfile
+	eend $?
 }
 
 stop() {

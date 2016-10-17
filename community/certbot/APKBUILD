@@ -1,27 +1,26 @@
 # Contributor: Carlo Landmeter <clandmeter@gmail.com>
 # Maintainer: Francesco Colista <fcolista@alpinelinux.org>
 pkgname=certbot
-pkgver=0.8.1
+pkgver=0.9.3
 pkgrel=0
 pkgdesc="An ACME client that can update Apache/Nginx configurations"
 url="https://github.com/certbot/certbot"
 arch="noarch"
 license="Apache"
 depends="py-setuptools py-mock py-acme py-configargparse py-configobj
-	py-cryptography py-parsedatetime py-psutil py-dialog py-openssl
+	py-cryptography py-parsedatetime py-dialog py-openssl
 	py-rfc3339 py-tz py-requests py-six py-zope-component py-zope-interface
 	py-zope-event py-cffi py-enum34 py-ipaddress py-idna"
 # define acme deps here and add them to makedepends
 # so they get pulled in when bootstrapping.
 _depends_acme="py-setuptools py-cryptography py-ndg_httpsclient py-asn1 py-openssl
 	py-tz py-rfc3339 py-requests py-six py-werkzeug"
-provides="letsencrypt"
+replaces="letsencrypt"
 depends_dev=""
 makedepends="$depends_dev $_depends_acme"
 install=""
 subpackages="py-acme:acme"
-source="certbot-$pkgver.tar.gz::https://github.com/certbot/certbot/archive/v$pkgver.tar.gz
-	letsencrypt-wrapper"
+source="certbot-$pkgver.tar.gz::https://github.com/certbot/certbot/archive/v$pkgver.tar.gz"
 
 _builddir="$srcdir"/$pkgname-$pkgver
 build() {
@@ -32,7 +31,6 @@ build() {
 package() {
 	cd "$_builddir"
 	python setup.py install --prefix=/usr --root="$pkgdir" || return 1
-	install -m755 "$srcdir"/letsencrypt-wrapper "$pkgdir"/usr/bin/letsencrypt
 }
 
 acme() {
@@ -43,9 +41,6 @@ acme() {
 	python setup.py install --prefix=/usr --root="$subpkgdir" || return 1
 }
 
-md5sums="b7823e4c573b0e5884d5f034999511e3  certbot-0.8.1.tar.gz
-98c8ab7fede335bd00b0f0d85cd447e1  letsencrypt-wrapper"
-sha256sums="1fb4834eba306a656f26257f86ed298df354cdecb1b0bde316a9d23a1e19db01  certbot-0.8.1.tar.gz
-4f3a6b71ce80f96f65204fe9c1509a299b5d856a1cc60b99c0dd869269badeff  letsencrypt-wrapper"
-sha512sums="8b21d270b5ee847086369b956b3346fdddd50ab0e4490d988e7ca535f4d4101e2859e99bc5f77ac920afd3a6a9210e407b155c89c28d282dc0544735a27e3eaa  certbot-0.8.1.tar.gz
-db22121e32f9654b9b27883fc405b727ba85426d4122b901bf494d3ccf12bf1d2093b68979c005551762cc1ea80c5e5a442098504e3aa0e1b9286dca4819c24c  letsencrypt-wrapper"
+md5sums="23920103accbed8adc6e7e30b14581e2  certbot-0.9.3.tar.gz"
+sha256sums="5c40cfcf3a17624e34dcb733148bd247c4f0cee189766fe0fb6d29571d4068bb  certbot-0.9.3.tar.gz"
+sha512sums="a951e639515fc037721d8b086e53100dcc86974a96c61c7173b2a9c0582bb59380efe219caf3fd1517fcdf28dde4a1f66bba84b51e2a2027df114818ff4d7565  certbot-0.9.3.tar.gz"

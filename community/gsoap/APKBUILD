@@ -1,0 +1,41 @@
+# Contributor: <xmingske@gmail.com>
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=gsoap
+pkgver=2.8.36
+pkgrel=1
+arch="all"
+pkgdesc='A cross-platform C and C++ SDK for SOAP/XML Web services'
+license="GPL-2 gSOAP"
+url="http://gsoap2.sourceforge.net"
+depends=
+makedepends="autoconf automake bison flex zlib-dev libressl-dev libtool"
+subpackages="$pkgname-dev"
+source="http://downloads.sourceforge.net/project/gsoap2/gsoap-${pkgver%.*}/gsoap_$pkgver.zip
+	musl-fixes.patch
+	"
+
+builddir="$srcdir"/$pkgname-${pkgver%.*}
+
+build() {
+	cd "${builddir}"
+	touch configure.ac aclocal.m4 configure Makefile.am Makefile.in
+	./configure --prefix=/usr \
+		--mandir=/usr/share/man \
+		--infodir=/usr/share/info \
+		--exec-prefix=/usr \
+		--enable-ipv6 \
+		|| return 1
+	make -j1 || return 1
+}
+
+package() {
+	cd "$builddir"
+	make DESTDIR="$pkgdir" install || return 1
+}
+
+md5sums="6f500965431eb253271cb087b153493e  gsoap_2.8.36.zip
+ce945058c898a360951c11d574699872  musl-fixes.patch"
+sha256sums="20f70db768062e094ec3749073bfc4103cacaac8cab2cdbd624634ae496eef21  gsoap_2.8.36.zip
+db122e51e629121ce295f76e1f0d90595c5450c42d46342def50c56696150363  musl-fixes.patch"
+sha512sums="6ebe479b91a1df92a7ac9019762d0a225f255ce9a772d56a50bccfe9b16645d1ee3bb38e4d2dd2fd960a3f9feee152204158e8002813db8d9ed6b2453c096287  gsoap_2.8.36.zip
+4c96126bdd9263fd686e7e9283e80d751f209a03d5920b9c3763851a1a8a48d48e1740eaa9269f05a1b3128a9476323a2359904dfd4c2ac43f5cee5ff64e4b98  musl-fixes.patch"

@@ -1,7 +1,7 @@
 # Maintainer: Jakub Jirutka <jakub@jirutka.cz>
 _gemname=bundler
 pkgname=ruby-$_gemname
-pkgver=1.12.5
+pkgver=1.13.3
 pkgrel=0
 pkgdesc="Manage an application's gem dependencies"
 url="http://gembundler.com/"
@@ -9,12 +9,8 @@ arch="noarch"
 license="MIT"
 depends="ruby ruby-io-console"
 makedepends=""
-source="http://gems.rubyforge.org/gems/$_gemname-$pkgver.gem"
-builddir="$srcdir"/$_gemname-$pkgver
-
-build() {
-	return 0
-}
+source="https://rubygems.org/downloads/$_gemname-$pkgver.gem"
+builddir="$srcdir/$_gemname-$pkgver"
 
 package() {
 	local gemdir="$pkgdir/$(ruby -rubygems -e 'puts Gem.default_dir')"
@@ -40,6 +36,6 @@ package() {
 	done
 }
 
-md5sums="2f6f897c2c77c790f51b26850661b3dc  bundler-1.12.5.gem"
-sha256sums="6c5e111b828de62d3b5d72d8ae0add77099a34059ede582f0de7c85479ec04e1  bundler-1.12.5.gem"
-sha512sums="e854186e06a2c09b532d5fa72ef75de3a9206b86b86ef4a7f6dbf5a02030a76efd43b213d440933252f2e2ead56d4675b2e180c0bd93cfaa870b408a5797a142  bundler-1.12.5.gem"
+md5sums="db8ab1fc131d94ffa7c5ddb3d9b8fb0b  bundler-1.13.3.gem"
+sha256sums="524092831a73e8d33d1030a2c6cb533f393e1e0573fa10ff1a0f2cbf57342555  bundler-1.13.3.gem"
+sha512sums="41ca8486e94f50f1e2372e0beced967f9befdf35a07aa6dd169f6becb9d8e08a98597575366ffed0c9456ef0eb44d1839651e23726874b199d15b6d8fb7a9998  bundler-1.13.3.gem"

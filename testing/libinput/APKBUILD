@@ -1,22 +1,20 @@
 # Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
 # Maintainer:
 pkgname=libinput
-pkgver=1.4.1
+pkgver=1.5.0
 pkgrel=0
 pkgdesc="Library for handling input devices"
 url="http://www.freedesktop.org/wiki/Software/libinput/"
 arch="all"
 license="custom"
 depends=""
-depends_dev=""
 makedepends="mtdev-dev eudev-dev libevdev-dev grep"
-install=""
 subpackages="$pkgname-dev $pkgname-doc"
 source="http://freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
 
-_builddir="$srcdir"/$pkgname-$pkgver
+builddir="$srcdir/$pkgname-$pkgver"
 build() {
-	cd "$_builddir"
+	cd "$builddir"
 	./configure \
 		--build=$CBUILD \
 		--host=$CHOST \
@@ -30,11 +28,10 @@ build() {
 }
 
 package() {
-	cd "$_builddir"
-	make DESTDIR="$pkgdir" install || return 1
-	install -Dm644 COPYING "$pkgdir"/usr/share/licenses/$pkgname/COPYING
+	make DESTDIR="$pkgdir" \
+		-C "$builddir" install || return 1
 }
 
-md5sums="2e7ba577ed74d8d1baeb07dbd4fb912a  libinput-1.4.1.tar.xz"
-sha256sums="26e7b3ab499358caba499705680ea7e5851af2bd37dc32f2be64181610d6392a  libinput-1.4.1.tar.xz"
-sha512sums="4f5c580db54c12e85f24356ffa1b10ee2322c769da707393900a089ea6b71ce5bbb1786e8a8ee544f2ee52d0974a410ed5756cb7b6a6570a66f84420315df2e2  libinput-1.4.1.tar.xz"
+md5sums="26030dae25f1ac584b0e428c90473339  libinput-1.5.0.tar.xz"
+sha256sums="5a96559385ecfaa30f9e72ea89eb8ebbc97caf68e458f451f4ed62315311081c  libinput-1.5.0.tar.xz"
+sha512sums="801b7a161d85f6e5f4ce03f3bc7e367ee22646cc8994e2660697d23af99ad2a91c0824e8bfc039b294ce4eac4c808697b3caf22b7b6587a201e8e75519be0a3a  libinput-1.5.0.tar.xz"

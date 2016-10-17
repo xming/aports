@@ -1,0 +1,939 @@
+Upstream code not yet released
+---
+diff --git a/salt/modules/apk.py b/salt/modules/apk.py
+new file mode 100644
+index 0000000..4c0efe0
+--- /dev/null
++++ b/salt/modules/apk.py
+@@ -0,0 +1,619 @@
++# -*- coding: utf-8 -*-
++'''
++Support for apk
++
++.. important::
++    If you feel that Salt should be using this module to manage packages on a
++    minion, and it is using a different module (or gives an error similar to
++    *'pkg.install' is not available*), see :ref:`here
++    <module-provider-override>`.
++
++.. versionadded: Nitrogen
++
++'''
++from __future__ import absolute_import
++
++# Import python libs
++import copy
++import logging
++
++# Import salt libs
++import salt.utils
++import salt.utils.itertools
++
++from salt.exceptions import CommandExecutionError
++
++log = logging.getLogger(__name__)
++
++# Define the module's virtual name
++__virtualname__ = 'pkg'
++
++
++def __virtual__():
++    '''
++    Confirm this module is running on an Alpine Linux distribution
++    '''
++    if __grains__.get('os_family', False) == 'Alpine':
++        return __virtualname__
++    return (False, "Module apk only works on Alpine Linux based systems")
++
++#def autoremove(list_only=False, purge=False):
++#    return 'Not available'
++#def hold(name=None, pkgs=None, sources=None, **kwargs):  # pylint: disable=W0613
++#    return 'Not available'
++#def unhold(name=None, pkgs=None, sources=None, **kwargs):  # pylint: disable=W0613
++#    return 'Not available'
++#def upgrade_available(name):
++#    return 'Not available'
++#def version_cmp(pkg1, pkg2, ignore_epoch=False):
++#    return 'Not available'
++#def list_repos():
++#    return 'Not available'
++#def get_repo(repo, **kwargs):
++#    return 'Not available'
++#def del_repo(repo, **kwargs):
++#    return 'Not available'
++#def del_repo_key(name=None, **kwargs):
++#    return 'Not available'
++#def mod_repo(repo, saltenv='base', **kwargs):
++#    return 'Not available'
++#def expand_repo_def(**kwargs):
++#    return 'Not available'
++#def get_selections(pattern=None, state=None):
++#    return 'Not available'
++#def set_selections(path=None, selection=None, clear=False, saltenv='base'):
++#    return 'Not available'
++#def info_installed(*names):
++#    return 'Not available'
++
++
++def version(*names, **kwargs):
++    '''
++    Returns a string representing the package version or an empty string if not
++    installed. If more than one package name is specified, a dict of
++    name/version pairs is returned.
++
++    CLI Example:
++
++    .. code-block:: bash
++
++        salt '*' pkg.version <package name>
++        salt '*' pkg.version <package1> <package2> <package3> ...
++    '''
++    return __salt__['pkg_resource.version'](*names, **kwargs)
++
++
++def refresh_db():
++    '''
++    Updates the package list
++
++    - ``True``: Database updated successfully
++    - ``False``: Problem updating database
++
++    CLI Example:
++
++    .. code-block:: bash
++
++        salt '*' pkg.refresh_db
++    '''
++    ret = {}
++    cmd = ['apk', 'update']
++    call = __salt__['cmd.run_all'](cmd,
++                                   output_loglevel='trace',
++                                   python_shell=False)
++    if call['retcode'] == 0:
++        errors = []
++        ret = True
++    else:
++        errors = [call['stdout']]
++        ret = False
++
++    if errors:
++        raise CommandExecutionError(
++            'Problem encountered installing package(s)',
++            info={'errors': errors, 'changes': ret}
++        )
++
++    return ret
++
++
++def list_pkgs(versions_as_list=False, **kwargs):
++    '''
++    List the packages currently installed in a dict::
++
++        {'<package_name>': '<version>'}
++
++    CLI Example:
++
++    .. code-block:: bash
++
++        salt '*' pkg.list_pkgs
++        salt '*' pkg.list_pkgs versions_as_list=True
++    '''
++    versions_as_list = salt.utils.is_true(versions_as_list)
++    # not yet implemented or not applicable
++    if any([salt.utils.is_true(kwargs.get(x))
++            for x in ('removed', 'purge_desired')]):
++        return {}
++
++    if 'pkg.list_pkgs' in __context__:
++        if versions_as_list:
++            return __context__['pkg.list_pkgs']
++        else:
++            ret = copy.deepcopy(__context__['pkg.list_pkgs'])
++            __salt__['pkg_resource.stringify'](ret)
++            return ret
++
++    cmd = ['apk', 'info', '-v']
++    ret = {}
++    out = __salt__['cmd.run'](cmd, output_loglevel='trace', python_shell=False)
++    for line in salt.utils.itertools.split(out, '\n'):
++        pkg_version = '-'.join(line.split('-')[-2:])
++        pkg_name = '-'.join(line.split('-')[:-2])
++        __salt__['pkg_resource.add_pkg'](ret, pkg_name, pkg_version)
++
++    __salt__['pkg_resource.sort_pkglist'](ret)
++    __context__['pkg.list_pkgs'] = copy.deepcopy(ret)
++    if not versions_as_list:
++        __salt__['pkg_resource.stringify'](ret)
++    return ret
++
++
++def latest_version(*names, **kwargs):
++    '''
++    Return the latest version of the named package available for upgrade or
++    installation. If more than one package name is specified, a dict of
++    name/version pairs is returned.
++
++    If the latest version of a given package is already installed, an empty
++    string will be returned for that package.
++
++    CLI Example:
++
++    .. code-block:: bash
++
++        salt '*' pkg.latest_version <package name>
++        salt '*' pkg.latest_version <package name>
++        salt '*' pkg.latest_version <package1> <package2> <package3> ...
++    '''
++    refresh = salt.utils.is_true(kwargs.pop('refresh', True))
++
++    if len(names) == 0:
++        return ''
++
++    ret = {}
++    for name in names:
++        ret[name] = ''
++    pkgs = list_pkgs()
++
++    # Refresh before looking for the latest version available
++    if refresh:
++        refresh_db()
++
++    # Upgrade check
++    cmd = ['apk', 'upgrade', '-s']
++    out = __salt__['cmd.run_stdout'](cmd,
++                                     output_loglevel='trace',
++                                     python_shell=False)
++    for line in salt.utils.itertools.split(out, '\n'):
++        try:
++            name = line.split(' ')[2]
++            _oldversion = line.split(' ')[3].strip('(')
++            newversion = line.split(' ')[5].strip(')')
++            if name in names:
++                ret[name] = newversion
++        except (ValueError, IndexError):
++            pass
++
++    # If version is empty, package may not be installed
++    for pkg in ret:
++        if not ret[pkg]:
++            installed = pkgs.get(pkg)
++            cmd = ['apk', 'search', pkg]
++            out = __salt__['cmd.run_stdout'](cmd,
++                                     output_loglevel='trace',
++                                     python_shell=False)
++            for line in salt.utils.itertools.split(out, '\n'):
++                try:
++                    pkg_version = '-'.join(line.split('-')[-2:])
++                    pkg_name = '-'.join(line.split('-')[:-2])
++                    if pkg == pkg_name:
++                        if installed == pkg_version:
++                            ret[pkg] = ''
++                        else:
++                            ret[pkg] = pkg_version
++                except ValueError:
++                    pass
++
++    # Return a string if only one package name passed
++    if len(names) == 1:
++        return ret[names[0]]
++    return ret
++
++
++# TODO: Support specific version installation
++def install(name=None,
++            refresh=False,
++            pkgs=None,
++            sources=None,
++            **kwargs):
++    '''
++    Install the passed package, add refresh=True to update the apk database.
++
++    name
++        The name of the package to be installed. Note that this parameter is
++        ignored if either "pkgs" or "sources" is passed. Additionally, please
++        note that this option can only be used to install packages from a
++        software repository. To install a package file manually, use the
++        "sources" option.
++
++        CLI Example:
++
++        .. code-block:: bash
++
++            salt '*' pkg.install <package name>
++
++    refresh
++        Whether or not to refresh the package database before installing.
++
++
++    Multiple Package Installation Options:
++
++    pkgs
++        A list of packages to install from a software repository. Must be
++        passed as a python list.
++
++        CLI Example:
++
++        .. code-block:: bash
++
++            salt '*' pkg.install pkgs='["foo", "bar"]'
++
++    sources
++        A list of IPK packages to install. Must be passed as a list of dicts,
++        with the keys being package names, and the values being the source URI
++        or local path to the package.  Dependencies are automatically resolved
++        and marked as auto-installed.
++
++        CLI Example:
++
++        .. code-block:: bash
++
++            salt '*' pkg.install sources='[{"foo": "salt://foo.deb"},{"bar": "salt://bar.deb"}]'
++
++    install_recommends
++        Whether to install the packages marked as recommended. Default is True.
++
++    Returns a dict containing the new package names and versions::
++
++        {'<package>': {'old': '<old-version>',
++                       'new': '<new-version>'}}
++    '''
++    refreshdb = salt.utils.is_true(refresh)
++    pkg_to_install = []
++
++    old = list_pkgs()
++
++    if name and not (pkgs or sources):
++        if ',' in name:
++            pkg_to_install = name.split(',')
++        else:
++            pkg_to_install = [name]
++
++    if pkgs:
++        # We don't support installing specific version for now
++        # so transform the dict in list ignoring version provided
++        pkgs = [
++            p.keys()[0] for p in pkgs
++            if isinstance(p, dict)
++        ]
++        pkg_to_install.extend(pkgs)
++
++    if not pkg_to_install:
++        return {}
++
++    if refreshdb:
++        refresh_db()
++
++    cmd = ['apk', 'add']
++
++    # Switch in update mode if a package is already installed
++    for _pkg in pkg_to_install:
++        if old.get(_pkg):
++            cmd.append('-u')
++            break
++
++    cmd.extend(pkg_to_install)
++
++    out = __salt__['cmd.run_all'](
++        cmd,
++        output_loglevel='trace',
++        python_shell=False
++    )
++
++    if out['retcode'] != 0 and out['stderr']:
++        errors = [out['stderr']]
++    else:
++        errors = []
++
++    __context__.pop('pkg.list_pkgs', None)
++    new = list_pkgs()
++    ret = salt.utils.compare_dicts(old, new)
++
++    if errors:
++        raise CommandExecutionError(
++            'Problem encountered installing package(s)',
++            info={'errors': errors, 'changes': ret}
++        )
++
++    return ret
++
++
++def purge(name=None, pkgs=None, **kwargs):
++    '''
++    Alias to remove
++    '''
++    return remove(name=name, pkgs=pkgs, purge=True)
++
++
++def remove(name=None, pkgs=None, purge=False, **kwargs):  # pylint: disable=unused-argument
++    '''
++    Remove packages using ``apk del``.
++
++    name
++        The name of the package to be deleted.
++
++
++    Multiple Package Options:
++
++    pkgs
++        A list of packages to delete. Must be passed as a python list. The
++        ``name`` parameter will be ignored if this option is passed.
++
++    Returns a dict containing the changes.
++
++    CLI Example:
++
++    .. code-block:: bash
++
++        salt '*' pkg.remove <package name>
++        salt '*' pkg.remove <package1>,<package2>,<package3>
++        salt '*' pkg.remove pkgs='["foo", "bar"]'
++    '''
++    old = list_pkgs()
++    pkg_to_remove = []
++
++    if name:
++        if ',' in name:
++            pkg_to_remove = name.split(',')
++        else:
++            pkg_to_remove = [name]
++
++    if pkgs:
++        pkg_to_remove.extend(pkgs)
++
++    if not pkg_to_remove:
++        return {}
++
++    if purge:
++        cmd = ['apk', 'del', '--purge']
++    else:
++        cmd = ['apk', 'del']
++
++    cmd.extend(pkg_to_remove)
++
++    out = __salt__['cmd.run_all'](
++        cmd,
++        output_loglevel='trace',
++        python_shell=False
++    )
++    if out['retcode'] != 0 and out['stderr']:
++        errors = [out['stderr']]
++    else:
++        errors = []
++
++    __context__.pop('pkg.list_pkgs', None)
++    new = list_pkgs()
++    ret = salt.utils.compare_dicts(old, new)
++
++    if errors:
++        raise CommandExecutionError(
++            'Problem encountered removing package(s)',
++            info={'errors': errors, 'changes': ret}
++        )
++
++    return ret
++
++
++def upgrade(name=None, pkgs=None, refresh=True):
++    '''
++    Upgrades all packages via ``apk upgrade`` or a specific package if name or
++    pkgs is specified. Name is ignored if pkgs is specified
++
++    Returns a dict containing the changes.
++
++        {'<package>':  {'old': '<old-version>',
++                        'new': '<new-version>'}}
++
++    CLI Example:
++
++    .. code-block:: bash
++
++        salt '*' pkg.upgrade
++    '''
++    ret = {'changes': {},
++           'result': True,
++           'comment': '',
++           }
++
++    if salt.utils.is_true(refresh):
++        refresh_db()
++
++    old = list_pkgs()
++
++    pkg_to_upgrade = []
++
++    if name and not pkgs:
++        if ',' in name:
++            pkg_to_upgrade = name.split(',')
++        else:
++            pkg_to_upgrade = [name]
++
++    if pkgs:
++        pkg_to_upgrade.extend(pkgs)
++
++    if pkg_to_upgrade:
++        cmd = ['apk', 'add', '-u']
++        cmd.extend(pkg_to_upgrade)
++    else:
++        cmd = ['apk', 'upgrade']
++
++    call = __salt__['cmd.run_all'](cmd,
++                                   output_loglevel='trace',
++                                   python_shell=False,
++                                   redirect_stderr=True)
++
++    if call['retcode'] != 0:
++        ret['result'] = False
++        if call['stdout']:
++            ret['comment'] = call['stdout']
++
++    __context__.pop('pkg.list_pkgs', None)
++    new = list_pkgs()
++    ret['changes'] = salt.utils.compare_dicts(old, new)
++
++    return ret
++
++
++def list_upgrades(refresh=True):
++    '''
++    List all available package upgrades.
++
++    CLI Example:
++
++    .. code-block:: bash
++
++        salt '*' pkg.list_upgrades
++    '''
++    ret = {}
++    if salt.utils.is_true(refresh):
++        refresh_db()
++
++    cmd = ['apk', 'upgrade', '-s']
++    call = __salt__['cmd.run_all'](cmd,
++                                   output_loglevel='trace',
++                                   python_shell=False)
++
++    if call['retcode'] != 0:
++        comment = ''
++        if 'stderr' in call:
++            comment += call['stderr']
++        if 'stdout' in call:
++            comment += call['stdout']
++        raise CommandExecutionError(
++                '{0}'.format(comment)
++        )
++    else:
++        out = call['stdout']
++
++    for line in out.splitlines():
++        if 'Upgrading' in line:
++            name = line.split(' ')[2]
++            _oldversion = line.split(' ')[3].strip('(')
++            newversion = line.split(' ')[5].strip(')')
++            ret[name] = newversion
++
++    return ret
++
++
++def file_list(*packages):
++    '''
++    List the files that belong to a package. Not specifying any packages will
++    return a list of _every_ file on the system's package database (not
++    generally recommended).
++
++    CLI Examples:
++
++    .. code-block:: bash
++
++        salt '*' pkg.file_list httpd
++        salt '*' pkg.file_list httpd postfix
++        salt '*' pkg.file_list
++    '''
++    return file_dict(*packages)
++
++
++def file_dict(*packages):
++    '''
++    List the files that belong to a package, grouped by package. Not
++    specifying any packages will return a list of _every_ file on the system's
++    package database (not generally recommended).
++
++    CLI Examples:
++
++    .. code-block:: bash
++
++        salt '*' pkg.file_list httpd
++        salt '*' pkg.file_list httpd postfix
++        salt '*' pkg.file_list
++    '''
++    errors = []
++    ret = {}
++    cmd_files = ['apk', 'info', '-L']
++
++    if not packages:
++        return 'Package name should be provided'
++
++    for package in packages:
++        files = []
++        cmd = cmd_files[:]
++        cmd.append(package)
++        out = __salt__['cmd.run_all'](cmd,
++                                      output_loglevel='trace',
++                                      python_shell=False)
++        for line in out['stdout'].splitlines():
++            if line.endswith('contains:'):
++                continue
++            else:
++                files.append(line)
++        if files:
++            ret[package] = files
++
++    return {'errors': errors, 'packages': ret}
++
++
++def owner(*paths):
++    '''
++    Return the name of the package that owns the file. Multiple file paths can
++    be passed. Like :mod:`pkg.version <salt.modules.apk.version`, if a single
++    path is passed, a string will be returned, and if multiple paths are passed,
++    a dictionary of file/package name pairs will be returned.
++
++    If the file is not owned by a package, or is not present on the minion,
++    then an empty string will be returned for that path.
++
++    CLI Example:
++
++        salt '*' pkg.owns /usr/bin/apachectl
++        salt '*' pkg.owns /usr/bin/apachectl /usr/bin/basename
++    '''
++    if not paths:
++        return 'You must provide a path'
++
++    ret = {}
++    cmd_search = ['apk', 'info', '-W']
++    for path in paths:
++        cmd = cmd_search[:]
++        cmd.append(path)
++        output = __salt__['cmd.run_stdout'](cmd,
++                                            output_loglevel='trace',
++                                            python_shell=False)
++        if output:
++            if 'ERROR:' in output:
++                ret[path] = 'Could not find owner package'
++            else:
++                ret[path] = output.split('by ')[1].strip()
++        else:
++            ret[path] = 'Error running {0}'.format(cmd)
++
++    return ret
+diff --git a/salt/modules/gentoo_service.py b/salt/modules/gentoo_service.py
+index 92cf48a..32dfcde 100644
+--- a/salt/modules/gentoo_service.py
++++ b/salt/modules/gentoo_service.py
+@@ -12,6 +12,14 @@ to the correct service manager
+ 
+ # Import Python libs
+ from __future__ import absolute_import
++import logging
++
++# Import salt libs
++import salt.utils.systemd
++import salt.utils.odict as odict
++
++# Set up logging
++log = logging.getLogger(__name__)
+ 
+ # Define the module's virtual name
+ __virtualname__ = 'service'
+@@ -19,12 +27,65 @@ __virtualname__ = 'service'
+ 
+ def __virtual__():
+     '''
+-    Only work on systems which default to systemd
++    Only work on systems which default to OpenRC
+     '''
+-    if __grains__['os'] == 'Gentoo':
++    if __grains__['os'] == 'Gentoo' and not salt.utils.systemd.booted(__context__):
++        return __virtualname__
++    if __grains__['os'] == 'Alpine':
+         return __virtualname__
+     return (False, 'The gentoo_service execution module cannot be loaded: '
+-            'only available on Gentoo systems.')
++            'only available on Gentoo/Open-RC systems.')
++
++
++def _ret_code(cmd):
++    log.debug('executing [{0}]'.format(cmd))
++    sts = __salt__['cmd.retcode'](cmd, python_shell=False)
++    return sts
++
++
++def _list_services():
++    return __salt__['cmd.run']('rc-update -v show').splitlines()
++
++
++def _get_service_list(include_enabled=True, include_disabled=False):
++    enabled_services = dict()
++    disabled_services = set()
++    lines = _list_services()
++    for line in lines:
++        if '|' not in line:
++            continue
++        service = [l.strip() for l in line.split('|')]
++        # enabled service should have runlevels
++        if service[1]:
++            if include_enabled:
++                enabled_services.update({service[0]: sorted(service[1].split())})
++            continue
++        # in any other case service is disabled
++        if include_disabled:
++            disabled_services.update({service[0]: []})
++    return enabled_services, disabled_services
++
++
++def _enable_delta(name, requested_runlevels):
++    all_enabled = get_enabled()
++    current_levels = set(all_enabled[name] if name in all_enabled else [])
++    enabled_levels = requested_runlevels - current_levels
++    disabled_levels = current_levels - requested_runlevels
++    return enabled_levels, disabled_levels
++
++
++def _disable_delta(name, requested_runlevels):
++    all_enabled = get_enabled()
++    current_levels = set(all_enabled[name] if name in all_enabled else [])
++    return current_levels & requested_runlevels
++
++
++def _service_cmd(*args):
++    return '/etc/init.d/{0} {1}'.format(args[0], ' '.join(args[1:]))
++
++
++def _enable_disable_cmd(name, command, runlevels=()):
++    return 'rc-update {0} {1} {2}'.format(command, name, ' '.join(sorted(runlevels))).strip()
+ 
+ 
+ def get_enabled():
+@@ -37,15 +98,8 @@ def get_enabled():
+ 
+         salt '*' service.get_enabled
+     '''
+-    ret = set()
+-    lines = __salt__['cmd.run']('rc-update show').splitlines()
+-    for line in lines:
+-        if '|' not in line:
+-            continue
+-        if 'shutdown' in line:
+-            continue
+-        ret.add(line.split('|')[0].strip())
+-    return sorted(ret)
++    (enabled_services, disabled_services) = _get_service_list()
++    return odict.OrderedDict(enabled_services)
+ 
+ 
+ def get_disabled():
+@@ -58,17 +112,9 @@ def get_disabled():
+ 
+         salt '*' service.get_disabled
+     '''
+-    ret = set()
+-    lines = __salt__['cmd.run']('rc-update -v show').splitlines()
+-    for line in lines:
+-        if '|' not in line:
+-            continue
+-        elif 'shutdown' in line:
+-            continue
+-        comps = line.split()
+-        if len(comps) < 3:
+-            ret.add(comps[0])
+-    return sorted(ret)
++    (enabled_services, disabled_services) = _get_service_list(include_enabled=False,
++                                                              include_disabled=True)
++    return sorted(disabled_services)
+ 
+ 
+ def available(name):
+@@ -82,7 +128,9 @@ def available(name):
+ 
+         salt '*' service.available sshd
+     '''
+-    return name in get_all()
++    (enabled_services, disabled_services) = _get_service_list(include_enabled=True,
++                                                              include_disabled=True)
++    return name in enabled_services or name in disabled_services
+ 
+ 
+ def missing(name):
+@@ -97,7 +145,7 @@ def missing(name):
+ 
+         salt '*' service.missing sshd
+     '''
+-    return name not in get_all()
++    return not available(name)
+ 
+ 
+ def get_all():
+@@ -110,7 +158,10 @@ def get_all():
+ 
+         salt '*' service.get_all
+     '''
+-    return sorted(get_enabled() + get_disabled())
++    (enabled_services, disabled_services) = _get_service_list(include_enabled=True,
++                                                              include_disabled=True)
++    enabled_services.update(dict([(s, []) for s in disabled_services]))
++    return odict.OrderedDict(enabled_services)
+ 
+ 
+ def start(name):
+@@ -123,8 +174,8 @@ def start(name):
+ 
+         salt '*' service.start <service name>
+     '''
+-    cmd = '/etc/init.d/{0} start'.format(name)
+-    return not __salt__['cmd.retcode'](cmd, python_shell=False)
++    cmd = _service_cmd(name, 'start')
++    return not _ret_code(cmd)
+ 
+ 
+ def stop(name):
+@@ -137,8 +188,8 @@ def stop(name):
+ 
+         salt '*' service.stop <service name>
+     '''
+-    cmd = '/etc/init.d/{0} stop'.format(name)
+-    return not __salt__['cmd.retcode'](cmd, python_shell=False)
++    cmd = _service_cmd(name, 'stop')
++    return not _ret_code(cmd)
+ 
+ 
+ def restart(name):
+@@ -151,8 +202,36 @@ def restart(name):
+ 
+         salt '*' service.restart <service name>
+     '''
+-    cmd = '/etc/init.d/{0} restart'.format(name)
+-    return not __salt__['cmd.retcode'](cmd, python_shell=False)
++    cmd = _service_cmd(name, 'restart')
++    return not _ret_code(cmd)
++
++
++def reload_(name):
++    '''
++    Reload the named service
++
++    CLI Example:
++
++    .. code-block:: bash
++
++        salt '*' service.reload <service name>
++    '''
++    cmd = _service_cmd(name, 'reload')
++    return not _ret_code(cmd)
++
++
++def zap(name):
++    '''
++    Resets service state
++
++    CLI Example:
++
++    .. code-block:: bash
++
++        salt '*' service.zap <service name>
++    '''
++    cmd = _service_cmd(name, 'zap')
++    return not _ret_code(cmd)
+ 
+ 
+ def status(name, sig=None):
+@@ -167,7 +246,10 @@ def status(name, sig=None):
+ 
+         salt '*' service.status <service name> [service signature]
+     '''
+-    return __salt__['status.pid'](sig if sig else name)
++    if sig:
++        return bool(__salt__['status.pid'](sig))
++    cmd = _service_cmd(name, 'status')
++    return not _ret_code(cmd)
+ 
+ 
+ def enable(name, **kwargs):
+@@ -178,10 +260,26 @@ def enable(name, **kwargs):
+ 
+     .. code-block:: bash
+ 
+-        salt '*' service.enable <service name>
++        salt '*' service.enable <service name> <runlevels=single-runlevel>
++        salt '*' service.enable <service name> <runlevels=[runlevel1,runlevel2]>
+     '''
+-    cmd = 'rc-update add {0} default'.format(name)
+-    return not __salt__['cmd.retcode'](cmd, python_shell=False)
++    if 'runlevels' in kwargs:
++        requested_levels = set(kwargs['runlevels'] if isinstance(kwargs['runlevels'],
++                                                                 list) else [kwargs['runlevels']])
++        enabled_levels, disabled_levels = _enable_delta(name, requested_levels)
++        commands = []
++        if disabled_levels:
++            commands.append(_enable_disable_cmd(name, 'delete', disabled_levels))
++        if enabled_levels:
++            commands.append(_enable_disable_cmd(name, 'add', enabled_levels))
++        if not commands:
++            return True
++    else:
++        commands = [_enable_disable_cmd(name, 'add')]
++    for cmd in commands:
++        if _ret_code(cmd):
++            return False
++    return True
+ 
+ 
+ def disable(name, **kwargs):
+@@ -192,10 +290,18 @@ def disable(name, **kwargs):
+ 
+     .. code-block:: bash
+ 
+-        salt '*' service.disable <service name>
++        salt '*' service.disable <service name> <runlevels=single-runlevel>
++        salt '*' service.disable <service name> <runlevels=[runlevel1,runlevel2]>
+     '''
+-    cmd = 'rc-update delete {0} default'.format(name)
+-    return not __salt__['cmd.retcode'](cmd, python_shell=False)
++    levels = []
++    if 'runlevels' in kwargs:
++        requested_levels = set(kwargs['runlevels'] if isinstance(kwargs['runlevels'],
++                                                                 list) else [kwargs['runlevels']])
++        levels = _disable_delta(name, requested_levels)
++        if not levels:
++            return True
++    cmd = _enable_disable_cmd(name, 'delete', levels)
++    return not _ret_code(cmd)
+ 
+ 
+ def enabled(name, **kwargs):
+@@ -206,9 +312,17 @@ def enabled(name, **kwargs):
+ 
+     .. code-block:: bash
+ 
+-        salt '*' service.enabled <service name>
++        salt '*' service.enabled <service name> <runlevels=single-runlevel>
++        salt '*' service.enabled <service name> <runlevels=[runlevel1,runlevel2]>
+     '''
+-    return name in get_enabled()
++    enabled_services = get_enabled()
++    if name not in enabled_services:
++        return False
++    if 'runlevels' not in kwargs:
++        return True
++    requested_levels = set(kwargs['runlevels'] if isinstance(kwargs['runlevels'],
++                                                             list) else [kwargs['runlevels']])
++    return len(requested_levels - set(enabled_services[name])) == 0
+ 
+ 
+ def disabled(name):
+@@ -219,6 +333,6 @@ def disabled(name):
+ 
+     .. code-block:: bash
+ 
+-        salt '*' service.disabled <service name>
++        salt '*' service.disabled <service name> <runlevels=[runlevel]>
+     '''
+     return name in get_disabled()

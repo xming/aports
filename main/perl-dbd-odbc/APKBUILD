@@ -2,8 +2,8 @@
 # Maintainer: Leonardo Arena <rnalrd@alpinelinux.org>
 pkgname=perl-dbd-odbc
 _realpkgname=DBD-ODBC
-pkgver=1.52
-pkgrel=1
+pkgver=1.56
+pkgrel=0
 pkgdesc="Perl CPAN DBD::ODBC module"
 url="http://search.cpan.org/dist/DBD-ODBC/"
 arch="all"
@@ -31,6 +31,6 @@ package() {
 	find "$pkgdir" \( -name perllocal.pod -o -name .packlist \) -delete
 }
 
-md5sums="5f4eadbbb7f1ac6e77ab92276ccae573  DBD-ODBC-1.52.tar.gz"
-sha256sums="793c4c52e37a980171b40976d1f7160890ec2b6af03504f90c507ea68976bb9e  DBD-ODBC-1.52.tar.gz"
-sha512sums="3f49b830dbea1a97a3220b7be9cc589ea20e9dbb937240144c17dea9d9efbbb1b44139184f12a93826e57bbe1a6a43e4a09e1b56515c929f568de64419ae1ffc  DBD-ODBC-1.52.tar.gz"
+md5sums="fdbe7a1fada61bc7c9a1ddaeff21b7ed  DBD-ODBC-1.56.tar.gz"
+sha256sums="d20a899881b2cf033052af4055cda1f5e9ab2720999cf2832518509ac6869cdc  DBD-ODBC-1.56.tar.gz"
+sha512sums="374bf0f87bbb84128f5999670aee228185d6741a2364745a6dd268068ea53b73f6c8756da60052ae86ec74a335b583d0ae93c449f620c467f1d1fba84fcfa805  DBD-ODBC-1.56.tar.gz"

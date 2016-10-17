@@ -1,36 +1,28 @@
 # Maintainer: Jose-Luis Rivas <ghostbar@riseup.net>
 pkgname=nodejs
-pkgver=6.3.1
+pkgver=6.6.0
 pkgrel=0
-pkgdesc='Evented I/O for V8 javascript'
-url='http://nodejs.org/'
-arch='all'
-license='MIT'
+pkgdesc="Evented I/O for V8 javascript"
+url="http://nodejs.org/"
+arch="all"
+license="MIT"
 # gold is needed for mksnapshot
-makedepends="$depends_dev python openssl-dev zlib-dev libuv-dev
-	linux-headers paxmark binutils-gold"
+makedepends="python openssl-dev zlib-dev libuv-dev linux-headers paxmark
+	binutils-gold"
 subpackages="$pkgname-dev $pkgname-doc"
 replaces="nodejs-lts"
 source="https://nodejs.org/dist/v$pkgver/node-v$pkgver.tar.gz"
-_builddir="$srcdir"/node-v$pkgver
-
-prepare() {
-        local i
-        cd "$_builddir"
-        for i in $source; do
-                case $i in
-                *.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
-                esac
-        done
-}
+builddir="$srcdir/node-v$pkgver"
 
 build() {
-        cd "$_builddir"
+	cd "$builddir"
+
 	./configure --prefix=/usr \
 		--shared-zlib \
 		--shared-libuv \
 		--shared-openssl \
 		|| return 1
+
 	# we need run mksnapshot at build time so paxmark it early
 	make -C out mksnapshot BUILDTYPE=Release \
 		&& paxmark -m out/Release/mksnapshot \
@@ -38,17 +30,18 @@ build() {
 }
 
 package() {
-	local d
-        cd "$_builddir"
+	cd "$builddir"
+
 	make DESTDIR="$pkgdir" install || return 1
 	# paxmark so JIT works
 	paxmark -m "$pkgdir"/usr/bin/node || return 1
 
 	cp -pr "$pkgdir"/usr/lib/node_modules/npm/man "$pkgdir"/usr/share || return 1
-	for d in doc html man; do
+	local d; for d in doc html man; do
 		rm -r "$pkgdir"/usr/lib/node_modules/npm/$d || return 1
 	done
 }
-md5sums="6a08fbe8788ea4c798ada16e274d8d98  node-v6.3.1.tar.gz"
-sha256sums="3f6144dcf13c210b11c83dc0b0a841219347a769b5a3b883b20f7ab8dc4008f6  node-v6.3.1.tar.gz"
-sha512sums="7b0670312361b88ba7997919276fe98bd0cd6a690efbcdfc903dfcc1dbd241406395dcfe67cebdd107ed9309c3fd4d2f3460caa6505dc84a7c1e418ad6de9c50  node-v6.3.1.tar.gz"
+
+md5sums="91d9a60ffdfec6287d220a25b99b8e31  node-v6.6.0.tar.gz"
+sha256sums="11b957de855a392ceaa8b300ec66236d6f9c6baa184837d00bdaba2da4aefe91  node-v6.6.0.tar.gz"
+sha512sums="77c98d120e80265e7cc93429c5df7834933f08fe43307132e3d9fb9d5f9a005c3d56cff9bdd1ce6ffb04ef9a5b0412557c99ac3de75e20e0cc40a78eab9dfebe  node-v6.6.0.tar.gz"
